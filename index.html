@@ -87,10 +87,10 @@
       </div>
     </div>
 
-    <!-- Winrate por Limite, Volume e Metas -->
+    <!-- Mãos por Limite, Volume Mensal e Metas -->
     <div class="grid lg:grid-cols-3 gap-6 mt-8">
       <div class="card rounded-xl p-6">
-        <h2 class="text-xl font-semibold mb-4">Winrate & Mãos por Limite</h2>
+        <h2 class="text-xl font-semibold mb-4">Mãos por Limite</h2>
         <canvas id="stakesChart"></canvas>
       </div>
 
@@ -169,65 +169,83 @@
       });
     }
 
-    // Gráfico de Winrate e Quantidade de Mãos por Limite
+    // Dados de suporte para os limites (Mãos e BB/100)
+    const stakesData = {
+      labels: ["NL25", "NL50", "NL100"],
+      hands: [15000, 28000, 13240],
+      bb100: [9.8, 6.3, 4.7]
+    };
+
+    // Gráfico de Mãos por Limite (apenas barra azul + BB/100 no hover)
     const ctxStakes = document.getElementById('stakesChart');
     if (ctxStakes) {
       new Chart(ctxStakes, {
         type: 'bar',
         data: {
-          labels: ["NL25", "NL50", "NL100"],
-          datasets: [
-            {
-              label: "BB/100",
-              data: [9.8, 6.3, 4.7],
-              backgroundColor: "#22C55E",
-              yAxisID: 'y'
-            },
-            {
-              label: "Mãos",
-              data: [15000, 28000, 13240],
-              backgroundColor: "#3B82F6",
-              yAxisID: 'y1'
-            }
-          ]
+          labels: stakesData.labels,
+          datasets: [{
+            label: "Mãos",
+            data: stakesData.hands,
+            backgroundColor: "#3B82F6"
+          }]
         },
         options: {
-          responsive: true,
-          scales: {
-            y: {
-              type: 'linear',
-              display: true,
-              position: 'left',
-              title: { display: true, text: 'BB/100' }
-            },
-            y1: {
-              type: 'linear',
-              display: true,
-              position: 'right',
-              grid: { drawOnChartArea: false },
-              title: { display: true, text: 'Mãos' }
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const index = context.dataIndex;
+                  const handsVal = context.raw.toLocaleString();
+                  const bbVal = stakesData.bb100[index];
+                  return [`Mãos: ${handsVal}`, `Winrate: ${bbVal} BB/100`];
+                }
+              }
             }
           }
         }
       });
     }
 
-    // Gráfico de Volume Mensal
+    // Dados do Volume Mensal (Mãos, Lucro e BB/100)
+    const monthlyData = {
+      labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
+      hands: [42000, 58000, 61000, 53000, 56240],
+      profit: [950, 1400, 1100, 1650, 1824],
+      bb100: [4.5, 6.0, 4.8, 7.8, 6.35]
+    };
+
+    // Gráfico de Volume Mensal (Barra de Mãos + Mãos/Lucro/BB100 no hover)
     const ctxHands = document.getElementById('handsChart');
     if (ctxHands) {
       new Chart(ctxHands, {
         type: 'bar',
         data: {
-          labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
+          labels: monthlyData.labels,
           datasets: [{
             label: "Mãos",
-            data: [42000, 58000, 61000, 53000, 56240],
+            data: monthlyData.hands,
             backgroundColor: "#3B82F6"
           }]
         },
         options: {
           plugins: {
-            legend: { display: false }
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const index = context.dataIndex;
+                  const handsVal = context.raw.toLocaleString();
+                  const profitVal = monthlyData.profit[index].toLocaleString();
+                  const bbVal = monthlyData.bb100[index];
+                  return [
+                    `Mãos: ${handsVal}`,
+                    `Lucro: +$${profitVal}`,
+                    `Winrate: ${bbVal} BB/100`
+                  ];
+                }
+              }
+            }
           }
         }
       });
