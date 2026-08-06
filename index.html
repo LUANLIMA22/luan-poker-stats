@@ -91,12 +91,16 @@
     <div class="grid lg:grid-cols-3 gap-6 mt-8">
       <div class="card rounded-xl p-6">
         <h2 class="text-xl font-semibold mb-4">Mãos por Limite</h2>
-        <canvas id="stakesChart"></canvas>
+        <div class="relative h-64">
+          <canvas id="stakesChart"></canvas>
+        </div>
       </div>
 
       <div class="card rounded-xl p-6">
         <h2 class="text-xl font-semibold mb-4">Volume Mensal</h2>
-        <canvas id="handsChart"></canvas>
+        <div class="relative h-64">
+          <canvas id="handsChart"></canvas>
+        </div>
       </div>
 
       <div class="card rounded-xl p-6">
@@ -176,7 +180,7 @@
       bb100: [9.8, 6.3, 4.7]
     };
 
-    // Gráfico de Mãos por Limite (apenas barra azul + BB/100 no hover)
+    // Gráfico de Mãos por Limite
     const ctxStakes = document.getElementById('stakesChart');
     if (ctxStakes) {
       new Chart(ctxStakes, {
@@ -186,10 +190,13 @@
           datasets: [{
             label: "Mãos",
             data: stakesData.hands,
-            backgroundColor: "#3B82F6"
+            backgroundColor: "#3B82F6",
+            barThickness: 32
           }]
         },
         options: {
+          responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
             tooltip: {
@@ -207,7 +214,7 @@
       });
     }
 
-    // Dados do Volume Mensal (Mãos, Lucro e BB/100)
+    // Dados do Volume Mensal
     const monthlyData = {
       labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
       hands: [42000, 58000, 61000, 53000, 56240],
@@ -215,7 +222,7 @@
       bb100: [4.5, 6.0, 4.8, 7.8, 6.35]
     };
 
-    // Gráfico de Volume Mensal (Barra de Mãos + Mãos/Lucro/BB100 no hover)
+    // Gráfico de Volume Mensal
     const ctxHands = document.getElementById('handsChart');
     if (ctxHands) {
       new Chart(ctxHands, {
@@ -225,10 +232,13 @@
           datasets: [{
             label: "Mãos",
             data: monthlyData.hands,
-            backgroundColor: "#3B82F6"
+            backgroundColor: "#3B82F6",
+            barThickness: 24
           }]
         },
         options: {
+          responsive: true,
+          maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
             tooltip: {
