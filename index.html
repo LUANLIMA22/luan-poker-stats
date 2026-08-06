@@ -205,7 +205,10 @@
                   const index = context.dataIndex;
                   const handsVal = context.raw.toLocaleString();
                   const bbVal = stakesData.bb100[index];
-                  return [`Mãos: ${handsVal}`, `Winrate: ${bbVal} BB/100`];
+                  return [
+                    `Mãos: ${handsVal}`,
+                    `🟩 Winrate: ${bbVal} BB/100`
+                  ];
                 }
               }
             }
@@ -250,8 +253,8 @@
                   const bbVal = monthlyData.bb100[index];
                   return [
                     `Mãos: ${handsVal}`,
-                    `Lucro: +$${profitVal}`,
-                    `Winrate: ${bbVal} BB/100`
+                    `🟩 Lucro: +$${profitVal}`,
+                    `🟩 Winrate: ${bbVal} BB/100`
                   ];
                 }
               }
