@@ -173,7 +173,7 @@
       });
     }
 
-    // Dados de suporte para os limites (Mãos e BB/100)
+    // Dados de suporte para os limites
     const stakesData = {
       labels: ["NL25", "NL50", "NL100"],
       hands: [15000, 28000, 13240],
@@ -205,10 +205,7 @@
                   const index = context.dataIndex;
                   const handsVal = context.raw.toLocaleString();
                   const bbVal = stakesData.bb100[index];
-                  return [
-                    `Mãos: ${handsVal}`,
-                    `🟩 Winrate: ${bbVal} BB/100`
-                  ];
+                  return `Mãos: ${handsVal}   🟩 Winrate: ${bbVal} BB/100`;
                 }
               }
             }
@@ -253,8 +250,7 @@
                   const bbVal = monthlyData.bb100[index];
                   return [
                     `Mãos: ${handsVal}`,
-                    `🟩 Lucro: +$${profitVal}`,
-                    `🟩 Winrate: ${bbVal} BB/100`
+                    `🟩 Lucro: +$${profitVal}   🟩 Winrate: ${bbVal} BB/100`
                   ];
                 }
               }
