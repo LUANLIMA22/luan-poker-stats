@@ -204,13 +204,14 @@
           plugins: {
             legend: { display: false },
             tooltip: {
+              displayColors: false, // Desativa o quadrado nativo desalinhado
               callbacks: {
                 label: function (context) {
                   const index = context.dataIndex;
                   const handsVal = context.raw.toLocaleString();
                   const bbVal = stakesData.bb100[index];
                   return [
-                    `Mãos: ${handsVal}`,
+                    `🟦 Mãos: ${handsVal}`,
                     `🟩 Winrate: ${bbVal} BB/100`
                   ];
                 }
@@ -223,10 +224,10 @@
 
     // Dados do Volume Mensal
     const monthlyData = {
-      labels: ["Jul"],
-      hands: [48117],
-      profit: [1758],
-      bb100: [3.48]
+      labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
+      hands: [42000, 58000, 61000, 53000, 56240],
+      profit: [950, 1400, 1100, 1650, 1824],
+      bb100: [4.5, 6.0, 4.8, 7.8, 6.35]
     };
 
     // Gráfico de Volume Mensal
