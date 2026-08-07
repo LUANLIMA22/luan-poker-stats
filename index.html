@@ -249,6 +249,7 @@
           plugins: {
             legend: { display: false },
             tooltip: {
+              displayColors: false, // Desativa o quadrado nativo desalinhado
               callbacks: {
                 label: function (context) {
                   const index = context.dataIndex;
@@ -256,9 +257,9 @@
                   const profitVal = monthlyData.profit[index].toLocaleString();
                   const bbVal = monthlyData.bb100[index];
                   return [
-                    `Mãos:${handsVal}`,
-                    `🟩Lucro:+$${profitVal}`,
-                    `🟩Winrate:${bbVal} BB/100`
+                    `🟦 Mãos: ${handsVal}`,
+                    `🟩 Lucro: +$${profitVal}`,
+                    `🟩 Winrate: ${bbVal} BB/100`
                   ];
                 }
               }
