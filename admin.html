@@ -55,13 +55,13 @@
           <input type="number" id="alvo_maos" class="input-field" required>
         </div>
         <div>
-          <label class="text-sm text-gray-400">Horas Jogadas</label>
-          <input type="number" id="horas_jogadas" class="input-field" required>
-        </div>
-        <div>
-          <label class="text-sm text-gray-400">Meta de Horas</label>
-          <input type="number" id="alvo_horas" class="input-field" required>
-        </div>
+  <label class="text-sm text-gray-400">Horas Jogadas</label>
+  <input type="number" step="0.01" id="horas_jogadas" class="input-field" required>
+</div>
+<div>
+  <label class="text-sm text-gray-400">Meta de Horas</label>
+  <input type="number" step="0.01" id="alvo_horas" class="input-field" required>
+</div>
       </div>
 
       <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition-colors mt-4">
@@ -93,8 +93,8 @@
         rakeback: parseFloat(document.getElementById('rakeback').value),
         bankroll: parseFloat(document.getElementById('bankroll').value),
         alvo_maos: parseInt(document.getElementById('alvo_maos').value),
-        horas_jogadas: parseInt(document.getElementById('horas_jogadas').value),
-        alvo_horas: parseInt(document.getElementById('alvo_horas').value)
+        horas_jogadas: parseFloat(document.getElementById('horas_jogadas').value),
+alvo_horas: parseFloat(document.getElementById('alvo_horas').value)
       };
 
       // Enviando para a tabela 'poker_stats' no Supabase
