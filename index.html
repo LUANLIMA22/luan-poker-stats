@@ -5,14 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Poker Dashboard</title>
   
-  <!-- Configurações PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#09090B">
   <link rel="apple-touch-icon" href="icon.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Script do Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -26,7 +24,6 @@
 
     <div id="aviso-erro" class="hidden mb-6 p-4 bg-red-900/50 border border-red-500 text-red-200 rounded-xl text-center text-sm font-semibold"></div>
 
-    <!-- Header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
       <div>
         <h1 class="text-3xl md:text-4xl font-bold">♠ Poker Dashboard</h1>
@@ -34,12 +31,7 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <!-- Botão Secreto para o Admin -->
-        <a href="admin.html" class="bg-zinc-800 text-gray-400 hover:text-white rounded-lg p-2.5 border border-zinc-700 transition-colors" title="Painel Admin">
-          ⚙️
-        </a>
-
-        <!-- Seletor com todos os meses de 2026 -->
+        <a href="admin.html" class="bg-zinc-800 text-gray-400 hover:text-white rounded-lg p-2.5 border border-zinc-700 transition-colors" title="Painel Admin">⚙️</a>
         <select id="seletorMes" class="bg-zinc-800 text-white rounded-lg px-4 py-2 border border-zinc-700 outline-none cursor-pointer">
           <option value="Dezembro 2026">Dezembro 2026</option>
           <option value="Novembro 2026">Novembro 2026</option>
@@ -57,7 +49,7 @@
       </div>
     </div>
 
-    <!-- Cards de Métricas (Banco de Dados) -->
+    <!-- Cards de Métricas -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
       <div class="card rounded-xl p-6">
         <p class="text-gray-400 text-sm">Mãos</p>
@@ -81,10 +73,10 @@
       </div>
     </div>
 
-    <!-- Mãos por Limite, Volume Mensal e Metas -->
+    <!-- Gráficos Centrais -->
     <div class="grid lg:grid-cols-3 gap-6 mt-8">
       <div class="card rounded-xl p-6">
-        <h2 class="text-xl font-semibold mb-4">Mãos por Limite</h2>
+        <h2 class="text-xl font-semibold mb-4 text-blue-400">Mãos por Limite (Acumulado)</h2>
         <div class="relative h-64">
           <canvas id="stakesChart"></canvas>
         </div>
@@ -122,7 +114,7 @@
       </div>
     </div>
 
-    <!-- RESUMO ANUAL (AUTOMÁTICO) -->
+    <!-- RESUMO ANUAL -->
     <div class="card rounded-xl p-6 mt-8">
       <h2 class="text-xl font-semibold mb-4">🏆 Resumo Anual (Acumulado)</h2>
       
@@ -148,13 +140,6 @@
     Chart.defaults.color = "#A1A1AA";
     Chart.defaults.borderColor = "#27272A";
 
-    // Banco de Dados Local SOMENTE para os Limites
-    const dadosGraficos = {
-      "Julho 2026": { limites: { maos: [12000, 22000, 14117], bb100: [4.2, 3.1, 3.48] } },
-      "Agosto 2026": { limites: { maos: [15000, 28000, 13240], bb100: [9.8, 6.3, 4.7] } },
-      "Setembro 2026": { limites: { maos: [0, 0, 0], bb100: [0, 0, 0] } }
-    };
-
     const supabaseUrl = 'https://zhgnlcwdagxzphhqbkjp.supabase.co'; 
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoZ25sY3dkYWd4enBoaHFia2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjI1MzcsImV4cCI6MjEwMTYzODUzN30.QRDhAK8wQorNhUwFEV4lWx6BKKlbjoVXpa3ewh3j6qc';
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -165,8 +150,21 @@
     const formatarNumero = (valor) => (valor || 0).toLocaleString('pt-BR');
 
     function criarGraficosBase() {
+      // Gráfico de Stakes agora é só barras
       stakesChart = new Chart(document.getElementById('stakesChart'), { 
-        type: 'bar', data: { labels: ["NL25", "NL50", "NL100"], datasets: [{ data: [0,0,0], backgroundColor: "#3B82F6", barThickness: 32 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        type: 'bar', data: { labels: ["NL50", "NL100"], datasets: [{ data: [0,0,0], backgroundColor: "#3B82F6", barThickness: 32 }] }, 
+        options: { 
+          responsive: true, maintainAspectRatio: false, 
+          plugins: { 
+            legend: { display: false },
+            tooltip: {
+              displayColors: false,
+              callbacks: {
+                label: function(context) { return `🟦 Total: ${formatarNumero(context.raw)} mãos`; }
+              }
+            }
+          } 
+        }
       });
 
       handsChart = new Chart(document.getElementById('handsChart'), { 
@@ -199,23 +197,14 @@
       const aviso = document.getElementById('aviso-erro');
       aviso.classList.add('hidden');
 
-      // 1. Atualizar Mãos Por Limite (Manual - Se existir)
-      const dataGraficos = dadosGraficos[mesSelecionado];
-      if (dataGraficos && dataGraficos.limites) {
-        stakesChart.data.datasets[0].data = dataGraficos.limites.maos; stakesChart.update();
-      } else {
-        stakesChart.data.datasets[0].data = [0,0,0]; stakesChart.update();
-      }
-
-      // 2. BUSCAR TODOS OS MESES NO SUPABASE (Para Gráfico Anual e Últimos 6 Meses)
+      // BUSCAR TODOS OS MESES NO SUPABASE
       const { data: todosDados, error: errTodos } = await supabaseClient
         .from('poker_stats')
-        .select('mes_ano, maos_jogadas, lucro, bb_100');
+        .select('*'); // Pegando tudo, inclusive limites
 
       if (!errTodos && todosDados) {
         const mesesOrdem = { "Janeiro": 1, "Fevereiro": 2, "Março": 3, "Abril": 4, "Maio": 5, "Junho": 6, "Julho": 7, "Agosto": 8, "Setembro": 9, "Outubro": 10, "Novembro": 11, "Dezembro": 12 };
         
-        // Ordena os meses em ordem cronológica
         todosDados.sort((a, b) => {
           let partsA = a.mes_ano.split(' ');
           let partsB = b.mes_ano.split(' ');
@@ -223,7 +212,29 @@
           return (mesesOrdem[partsA[0]] || 0) - (mesesOrdem[partsB[0]] || 0);
         });
 
-        // --- ATUALIZAR GRÁFICO ANUAL ---
+        // LÓGICA DO GRÁFICO DE MÃOS POR LIMITE (ACUMULADO DO ANO ATÉ O MÊS SELECIONADO)
+        let partesSelecionado = mesSelecionado.split(' ');
+        let mesSelNum = mesesOrdem[partesSelecionado[0]];
+        let anoSelNum = parseInt(partesSelecionado[1]);
+        
+        let somaNL50 = 0, somaNL100 = 0;
+
+        todosDados.forEach(d => {
+          let partes = d.mes_ano.split(' ');
+          let mNum = mesesOrdem[partes[0]];
+          let aNum = parseInt(partes[1]);
+
+          // Soma apenas se for do mesmo ano e de um mês anterior ou igual ao selecionado
+          if (aNum === anoSelNum && mNum <= mesSelNum) {
+            somaNL50 += (d.maos_nl50 || 0);
+            somaNL100 += (d.maos_nl100 || 0);
+          }
+        });
+        
+        stakesChart.data.datasets[0].data = [somaNL50, somaNL100];
+        stakesChart.update();
+
+        // LÓGICA DO GRÁFICO ANUAL GERAL
         let somaMaos = 0, somaLucro = 0;
         let labelsAno = [], maosAno = [], lucroAno = [];
 
@@ -246,23 +257,20 @@
         anualChart.data.datasets[1].data = maosAno;
         anualChart.update();
 
-        // --- ATUALIZAR GRÁFICO 6 MESES (AUTOMÁTICO) ---
+        // LÓGICA DO GRÁFICO DE 6 MESES
         let selectedIdx = todosDados.findIndex(d => d.mes_ano === mesSelecionado);
         let ultimos6 = [];
         
         if (selectedIdx !== -1) {
-          // Pega os 6 meses incluindo o mês selecionado
           let startIdx = Math.max(0, selectedIdx - 5);
           ultimos6 = todosDados.slice(startIdx, selectedIdx + 1);
         } else {
-          // Se o mês selecionado não existir no banco, exibe os últimos 6 cadastrados no geral
           ultimos6 = todosDados.slice(-6);
         }
 
         handsChart.data.labels = ultimos6.map(d => d.mes_ano.split(' ')[0].substring(0,3));
         handsChart.data.datasets[0].data = ultimos6.map(d => d.maos_jogadas || 0);
         
-        // Tooltip rica para o gráfico de 6 meses
         handsChart.options.plugins.tooltip = {
           displayColors: false,
           callbacks: {
@@ -280,7 +288,7 @@
         handsChart.update();
       }
 
-      // 3. Atualizar Cards e Metas do Mês Selecionado (Do Supabase)
+      // PREENCHIMENTO DOS CARDS COM O MÊS SELECIONADO
       const { data, error } = await supabaseClient
         .from('poker_stats')
         .select('*')
