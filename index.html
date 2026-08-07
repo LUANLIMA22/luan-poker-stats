@@ -4,9 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Poker Dashboard</title>
+  
+  <!-- Configurações PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#09090B">
   <link rel="apple-touch-icon" href="icon.png">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Script do Supabase -->
@@ -24,7 +27,13 @@
     <div id="aviso-erro" class="hidden mb-6 p-4 bg-red-900/50 border border-red-500 text-red-200 rounded-xl text-center text-sm font-semibold"></div>
 
     <!-- Header -->
-    <div class="flex items-center gap-3">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-bold">♠ Poker Dashboard</h1>
+        <p class="text-gray-400 mt-1">Resultados • Estatísticas • Evolução</p>
+      </div>
+
+      <div class="flex items-center gap-3">
         <!-- Botão Secreto para o Admin -->
         <a href="admin.html" class="bg-zinc-800 text-gray-400 hover:text-white rounded-lg p-2.5 border border-zinc-700 transition-colors" title="Painel Admin">
           ⚙️
@@ -37,10 +46,17 @@
           <option value="Setembro 2026">Setembro 2026</option>
           <option value="Agosto 2026">Agosto 2026</option>
           <option value="Julho 2026" selected>Julho 2026</option>
+          <option value="Junho 2026" selected>Julho 2026</option>
+          <option value="Maio 2026" selected>Julho 2026</option>
+          <option value="Abril 2026" selected>Julho 2026</option>
+          <option value="Março 2026" selected>Julho 2026</option>
+          <option value="Fevereiro 2026" selected>Julho 2026</option>
+          <option value="Janeiro 2026" selected>Julho 2026</option>
         </select>
       </div>
+    </div>
 
-    <!-- Cards de Métricas (Vêm do Banco de Dados) -->
+    <!-- Cards de Métricas (Banco de Dados) -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
       <div class="card rounded-xl p-6">
         <p class="text-gray-400 text-sm">Mãos</p>
@@ -67,12 +83,11 @@
     <!-- Gráficos Mensais Principais -->
     <div class="grid lg:grid-cols-2 gap-6 mt-8">
       <div class="card rounded-xl p-6">
-        <h2 class="font-semibold text-xl mb-4">Lucro Mensal</h2>
+        <h2 class="font-semibold text-xl mb-4">Lucro Semanal</h2>
         <canvas id="profitChart"></canvas>
       </div>
-
       <div class="card rounded-xl p-6">
-        <h2 class="font-semibold text-xl mb-4">Bankroll Mensal</h2>
+        <h2 class="font-semibold text-xl mb-4">Bankroll Semanal</h2>
         <canvas id="bankrollChart"></canvas>
       </div>
     </div>
@@ -85,14 +100,12 @@
           <canvas id="stakesChart"></canvas>
         </div>
       </div>
-
       <div class="card rounded-xl p-6">
-        <h2 class="text-xl font-semibold mb-4">Volume Mensal</h2>
+        <h2 class="text-xl font-semibold mb-4">Mãos nos Últimos Meses</h2>
         <div class="relative h-64">
           <canvas id="handsChart"></canvas>
         </div>
       </div>
-
       <div class="card rounded-xl p-6">
         <h2 class="text-xl font-semibold mb-4">Metas (Banco de Dados)</h2>
         <div class="space-y-6">
@@ -120,46 +133,51 @@
       </div>
     </div>
 
+    <!-- NOVO: RESUMO ANUAL (100% AUTOMÁTICO DO BANCO) -->
+    <div class="card rounded-xl p-6 mt-8">
+      <h2 class="text-xl font-semibold mb-4">🏆 Resumo Anual (Acumulado)</h2>
+      
+      <div class="flex flex-col md:flex-row gap-6 mb-6">
+        <div class="bg-zinc-800/50 p-4 rounded-lg flex-1 border border-zinc-700">
+          <p class="text-gray-400 text-sm">Total de Mãos no Ano</p>
+          <h3 id="total-maos-ano" class="text-3xl font-bold mt-1 text-blue-400">0</h3>
+        </div>
+        <div class="bg-zinc-800/50 p-4 rounded-lg flex-1 border border-zinc-700">
+          <p class="text-gray-400 text-sm">Lucro Total no Ano</p>
+          <h3 id="total-lucro-ano" class="text-3xl font-bold mt-1 text-green-400">$0</h3>
+        </div>
+      </div>
+
+      <div class="relative h-72">
+        <canvas id="anualChart"></canvas>
+      </div>
+    </div>
+
   </div>
 
   <script>
     Chart.defaults.color = "#A1A1AA";
     Chart.defaults.borderColor = "#27272A";
 
-    // --- BANCO DE DADOS DOS GRÁFICOS (Edite isso no código quando o mês virar) ---
+    // Banco de Dados Local para os gráficos semanais e limites menores
     const dadosGraficos = {
       "Julho 2026": {
         lucroLinha: [500, 900, 1200, 1400, 1758],
         bankrollLinha: [3800, 4600, 5200, 5800, 6400],
         limites: { maos: [12000, 22000, 14117], bb100: [4.2, 3.1, 3.48] },
-        volume: { 
-          labels: ["Mar", "Abr", "Mai", "Jun", "Jul"],
-          maos: [35000, 42000, 58000, 61000, 48117], 
-          lucro: [600, 950, 1400, 1100, 1758], 
-          bb100: [3.5, 4.5, 6.0, 4.8, 3.48] 
-        }
+        volume: { labels: ["Mar", "Abr", "Mai", "Jun", "Jul"], maos: [35000, 42000, 58000, 61000, 48117], lucro: [600, 950, 1400, 1100, 1758], bb100: [3.5, 4.5, 6.0, 4.8, 3.48] }
       },
       "Agosto 2026": {
         lucroLinha: [950, 1400, 1100, 1650, 1824],
         bankrollLinha: [4200, 5100, 5800, 6400, 7415],
         limites: { maos: [15000, 28000, 13240], bb100: [9.8, 6.3, 4.7] },
-        volume: { 
-          labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
-          maos: [42000, 58000, 61000, 53000, 56240], 
-          lucro: [950, 1400, 1100, 1650, 1824], 
-          bb100: [4.5, 6.0, 4.8, 7.8, 6.35] 
-        }
+        volume: { labels: ["Abr", "Mai", "Jun", "Jul", "Ago"], maos: [42000, 58000, 61000, 53000, 56240], lucro: [950, 1400, 1100, 1650, 1824], bb100: [4.5, 6.0, 4.8, 7.8, 6.35] }
       },
       "Setembro 2026": {
         lucroLinha: [0, 0, 0, 0, 0],
         bankrollLinha: [7415, 7415, 7415, 7415, 7415],
         limites: { maos: [0, 0, 0], bb100: [0, 0, 0] },
-        volume: { 
-          labels: ["Mai", "Jun", "Jul", "Ago", "Set"],
-          maos: [58000, 61000, 53000, 56240, 0], 
-          lucro: [1400, 1100, 1650, 1824, 0], 
-          bb100: [6.0, 4.8, 7.8, 6.35, 0] 
-        }
+        volume: { labels: ["Mai", "Jun", "Jul", "Ago", "Set"], maos: [58000, 61000, 53000, 56240, 0], lucro: [1400, 1100, 1650, 1824, 0], bb100: [6.0, 4.8, 7.8, 6.35, 0] }
       }
     };
 
@@ -167,53 +185,55 @@
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoZ25sY3dkYWd4enBoaHFia2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjI1MzcsImV4cCI6MjEwMTYzODUzN30.QRDhAK8wQorNhUwFEV4lWx6BKKlbjoVXpa3ewh3j6qc';
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    let profitChart, bankrollChart, stakesChart, handsChart;
+    let profitChart, bankrollChart, stakesChart, handsChart, anualChart;
 
     const formatarMoeda = (valor) => (valor >= 0 ? "+$" : "-$") + Math.abs(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     const formatarNumero = (valor) => (valor || 0).toLocaleString('pt-BR');
 
     function criarGraficosBase() {
-      // Cria a estrutura vazia dos gráficos que será preenchida depois
       profitChart = new Chart(document.getElementById('profitChart'), { type: 'line', data: { labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem", "Fim"], datasets: [{ label: "Lucro ($)", data: [0,0,0,0,0], borderColor: "#22C55E", backgroundColor: "rgba(34, 197, 94, 0.2)", fill: true, tension: 0.35 }] }});
       bankrollChart = new Chart(document.getElementById('bankrollChart'), { type: 'line', data: { labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem", "Fim"], datasets: [{ label: "Bankroll ($)", data: [0,0,0,0,0], borderColor: "#8B5CF6", backgroundColor: "rgba(139, 92, 246, 0.2)", fill: true, tension: 0.35 }] }});
       
       stakesChart = new Chart(document.getElementById('stakesChart'), { 
-        type: 'bar', data: { labels: ["NL25", "NL50", "NL100"], datasets: [{ data: [0,0,0], backgroundColor: "#3B82F6", barThickness: 32 }] }, 
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false },
-          tooltip: {
-            displayColors: false,
-            callbacks: {
-              label: function (context) {
-                const mes = document.getElementById('seletorMes').value;
-                const limites = (dadosGraficos[mes] || dadosGraficos["Julho 2026"]).limites;
-                return [`🟦 Mãos: ${context.raw.toLocaleString()}`, `🟩 Winrate: ${limites.bb100[context.dataIndex]} BB/100`];
-              }
-            }
-          }
-        }}
+        type: 'bar', data: { labels: ["NL25", "NL50", "NL100"], datasets: [{ data: [0,0,0], backgroundColor: "#3B82F6", barThickness: 32 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
       });
 
       handsChart = new Chart(document.getElementById('handsChart'), { 
-        type: 'bar', data: { labels: ["1","2","3","4","5"], datasets: [{ data: [0,0,0,0,0], backgroundColor: "#3B82F6", barThickness: 24 }] }, 
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false },
-          tooltip: {
-            displayColors: false,
-            callbacks: {
-              label: function (context) {
-                const mes = document.getElementById('seletorMes').value;
-                const vol = (dadosGraficos[mes] || dadosGraficos["Julho 2026"]).volume;
-                return [`🟦 Mãos: ${context.raw.toLocaleString()}`, `🟩 Lucro: $${vol.lucro[context.dataIndex].toLocaleString()}`, `🟩 Winrate: ${vol.bb100[context.dataIndex]} BB/100`];
-              }
+        type: 'bar', data: { labels: ["1","2","3","4","5"], datasets: [{ data: [0,0,0,0,0], backgroundColor: "#3B82F6", barThickness: 24 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+
+      // NOVO: Gráfico Anual de Duplo Eixo
+      anualChart = new Chart(document.getElementById('anualChart'), {
+        type: 'bar',
+        data: {
+          labels: [],
+          datasets: [
+            {
+              type: 'line', label: 'Lucro ($)', data: [], borderColor: '#22C55E', backgroundColor: '#22C55E', borderWidth: 3, yAxisID: 'yLucro', tension: 0.3
+            },
+            {
+              type: 'bar', label: 'Mãos', data: [], backgroundColor: 'rgba(59, 130, 246, 0.6)', borderRadius: 4, yAxisID: 'yMaos'
             }
-          }
-        }}
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: { grid: { display: false, color: '#27272A' } },
+            yMaos: { type: 'linear', display: true, position: 'left', grid: { display: false }, ticks: { color: '#60A5FA' } },
+            yLucro: { type: 'linear', display: true, position: 'right', grid: { color: '#27272A' }, ticks: { color: '#4ADE80' } }
+          },
+          plugins: { legend: { display: true, labels: { color: '#A1A1AA' } } }
+        }
       });
     }
 
     async function carregarDados() {
       const mesSelecionado = document.getElementById('seletorMes').value;
-      
-      // 1. ATUALIZAR GRÁFICOS (Local)
+      const aviso = document.getElementById('aviso-erro');
+      aviso.classList.add('hidden');
+
+      // 1. Atualizar Gráficos Locais Secundários
       const dataGraficos = dadosGraficos[mesSelecionado];
       if (dataGraficos) {
         profitChart.data.datasets[0].data = dataGraficos.lucroLinha; profitChart.update();
@@ -223,10 +243,51 @@
         handsChart.data.datasets[0].data = dataGraficos.volume.maos; handsChart.update();
       }
 
-      // 2. ATUALIZAR NÚMEROS E METAS (Supabase)
-      const aviso = document.getElementById('aviso-erro');
-      aviso.classList.add('hidden');
+      // 2. BUSCAR TODOS OS MESES NO SUPABASE (Para o Gráfico Anual Automático)
+      const { data: todosDados, error: errTodos } = await supabaseClient
+        .from('poker_stats')
+        .select('mes_ano, maos_jogadas, lucro');
 
+      if (!errTodos && todosDados) {
+        // Ordenador de meses para o gráfico (Jan a Dez)
+        const mesesOrdem = { "Janeiro": 1, "Fevereiro": 2, "Março": 3, "Abril": 4, "Maio": 5, "Junho": 6, "Julho": 7, "Agosto": 8, "Setembro": 9, "Outubro": 10, "Novembro": 11, "Dezembro": 12 };
+        
+        todosDados.sort((a, b) => {
+          let partsA = a.mes_ano.split(' ');
+          let partsB = b.mes_ano.split(' ');
+          if(partsA[1] !== partsB[1]) return parseInt(partsA[1] || 0) - parseInt(partsB[1] || 0); // Ordena por ano
+          return (mesesOrdem[partsA[0]] || 0) - (mesesOrdem[partsB[0]] || 0); // Ordena por mês
+        });
+
+        let somaMaos = 0, somaLucro = 0;
+        let labelsAno = [], maosAno = [], lucroAno = [];
+
+        todosDados.forEach(d => {
+          somaMaos += (d.maos_jogadas || 0);
+          somaLucro += (d.lucro || 0);
+          
+          let partes = d.mes_ano.split(' ');
+          let labelCurto = partes.length === 2 ? partes[0].substring(0,3) + '/' + partes[1].substring(2,4) : d.mes_ano; // Ex: Jul/26
+          
+          labelsAno.push(labelCurto);
+          maosAno.push(d.maos_jogadas || 0);
+          lucroAno.push(d.lucro || 0);
+        });
+
+        // Atualiza a tela com o somatório Anual
+        document.getElementById('total-maos-ano').innerText = formatarNumero(somaMaos);
+        const elLucroAno = document.getElementById('total-lucro-ano');
+        elLucroAno.innerText = formatarMoeda(somaLucro);
+        elLucroAno.className = somaLucro < 0 ? "text-3xl font-bold mt-1 text-red-400" : "text-3xl font-bold mt-1 text-green-400";
+
+        // Atualiza o Gráfico Anual
+        anualChart.data.labels = labelsAno;
+        anualChart.data.datasets[0].data = lucroAno;
+        anualChart.data.datasets[1].data = maosAno;
+        anualChart.update();
+      }
+
+      // 3. Atualizar Cards e Metas do Mês Selecionado (Do Supabase)
       const { data, error } = await supabaseClient
         .from('poker_stats')
         .select('*')
@@ -256,11 +317,9 @@
       }
 
       document.getElementById('card-maos').innerText = formatarNumero(data.maos_jogadas);
-      
       const cardLucro = document.getElementById('card-lucro');
       cardLucro.innerText = formatarMoeda(data.lucro);
       cardLucro.className = data.lucro < 0 ? "text-3xl font-bold text-red-400 mt-2" : "text-3xl font-bold text-green-400 mt-2";
-      
       document.getElementById('card-bb100').innerText = data.bb_100;
       document.getElementById('card-rakeback').innerText = "$" + formatarNumero(data.rakeback);
       document.getElementById('card-bankroll').innerText = "$" + formatarNumero(data.bankroll);
@@ -278,15 +337,16 @@
       document.getElementById('meta-horas-barra').style.width = Math.min(pctHoras, 100) + "%";
     }
 
+    // Registro do PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+
     window.onload = function() {
       criarGraficosBase();
       carregarDados();
       document.getElementById('seletorMes').addEventListener('change', carregarDados);
     };
   </script>
-<script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js');
-    }
-  </script></body>
+</body>
 </html>
