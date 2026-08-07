@@ -16,7 +16,6 @@
 
   <div class="max-w-2xl mx-auto bg-[#18181B] border border-zinc-800 p-6 md:p-8 rounded-xl shadow-lg relative">
     
-    <!-- Botão de Voltar -->
     <a href="index.html" class="inline-flex items-center text-blue-400 hover:text-blue-300 font-semibold mb-6 transition-colors">
       <span class="mr-2">⬅️</span> Voltar para o Dashboard
     </a>
@@ -31,9 +30,10 @@
         <input type="text" id="mes_ano" class="input-field" required>
       </div>
 
+      <!-- Métricas Principais -->
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="text-sm text-gray-400">Mãos Jogadas</label>
+          <label class="text-sm text-gray-400">Total de Mãos Jogadas</label>
           <input type="number" id="maos_jogadas" class="input-field" required>
         </div>
         <div>
@@ -54,6 +54,22 @@
         </div>
       </div>
 
+      <!-- NOVO: Divisão de Mãos por Limite -->
+      <div class="border-t border-zinc-800 pt-6">
+        <h3 class="text-lg font-semibold mb-4 text-blue-400">Mãos por Limite</h3>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="text-sm text-gray-400">NL50</label>
+            <input type="number" id="maos_nl50" class="input-field" value="0">
+          </div>
+          <div>
+            <label class="text-sm text-gray-400">NL100</label>
+            <input type="number" id="maos_nl100" class="input-field" value="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Metas -->
       <div class="border-t border-zinc-800 pt-6 grid grid-cols-3 gap-4">
         <div>
           <label class="text-sm text-gray-400">Meta de Mãos</label>
@@ -92,14 +108,17 @@
 
       const dados = {
         mes_ano: document.getElementById('mes_ano').value,
-        maos_jogadas: parseInt(document.getElementById('maos_jogadas').value),
-        lucro: parseFloat(document.getElementById('lucro').value),
-        bb_100: parseFloat(document.getElementById('bb_100').value),
-        rakeback: parseFloat(document.getElementById('rakeback').value),
-        bankroll: parseFloat(document.getElementById('bankroll').value),
-        alvo_maos: parseInt(document.getElementById('alvo_maos').value),
-        horas_jogadas: parseFloat(document.getElementById('horas_jogadas').value),
-        alvo_horas: parseFloat(document.getElementById('alvo_horas').value)
+        maos_jogadas: parseInt(document.getElementById('maos_jogadas').value || 0),
+        lucro: parseFloat(document.getElementById('lucro').value || 0),
+        bb_100: parseFloat(document.getElementById('bb_100').value || 0),
+        rakeback: parseFloat(document.getElementById('rakeback').value || 0),
+        bankroll: parseFloat(document.getElementById('bankroll').value || 0),
+        alvo_maos: parseInt(document.getElementById('alvo_maos').value || 0),
+        horas_jogadas: parseFloat(document.getElementById('horas_jogadas').value || 0),
+        alvo_horas: parseFloat(document.getElementById('alvo_horas').value || 0),
+        // Adicionando os limites ao envio
+        maos_nl50: parseInt(document.getElementById('maos_nl50').value || 0),
+        maos_nl100: parseInt(document.getElementById('maos_nl100').value || 0)
       };
 
       const { data, error } = await supabaseClient
