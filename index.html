@@ -223,7 +223,7 @@
 
     // Dados do Volume Mensal
     const monthlyData = {
-      labels: ["Jul", "Ago"],
+      labels: ["Jul"],
       hands: [48117],
       profit: [1758],
       bb100: [3.48]
@@ -256,9 +256,9 @@
                   const profitVal = monthlyData.profit[index].toLocaleString();
                   const bbVal = monthlyData.bb100[index];
                   return [
-                    `Mãos: ${handsVal}`,
-                    `🟩 Lucro: +$${profitVal}`,
-                    `🟩 Winrate: ${bbVal} BB/100`
+                    `Mãos:${handsVal}`,
+                    `🟩Lucro: +$${profitVal}`,
+                    `🟩Winrate: ${bbVal} BB/100`
                   ];
                 }
               }
