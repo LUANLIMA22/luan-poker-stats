@@ -129,7 +129,7 @@
               <span class="font-semibold">Horas</span>
               <span id="meta-horas-texto" class="text-blue-400 font-bold">0%</span>
             </div>
-            <div id="meta-horas-valores" class="text-xs text-gray-400 mb-2">83.35h / 100h</div>
+            <div id="meta-horas-valores" class="text-xs text-gray-400 mb-2">h / 0h</div>
             <div class="bg-zinc-700 h-3 rounded overflow-hidden">
               <div id="meta-horas-barra" class="bg-blue-500 h-3 rounded w-0 transition-all duration-500"></div>
             </div>
@@ -148,26 +148,11 @@
     // --- BANCO DE DADOS DOS MESES ---
     // Preencha seus resultados e metas reais aqui!
     const dadosDosMeses = {
-      "Agosto 2026": {
-        cards: { maos: "56.240", lucro: "+$1.824", bb100: "6.35", rakeback: "$412", bankroll: "$7.415" },
-        // Agora você informa qual era a meta e quanto já jogou em horas
-        metas: { alvoMaos: 60000, horasJogadas: 112, alvoHoras: 120 },
-        charts: {
-          lucroLinha: [950, 1400, 1100, 1650, 1824],
-          bankrollLinha: [4200, 5100, 5800, 6400, 7415],
-          limites: { maos: [15000, 28000, 13240], bb100: [9.8, 6.3, 4.7] },
-          volume: { 
-            labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
-            maos: [42000, 58000, 61000, 53000, 56240], 
-            lucro: [950, 1400, 1100, 1650, 1824], 
-            bb100: [4.5, 6.0, 4.8, 7.8, 6.35] 
-          }
-        }
-      },
+      
       "Julho 2026": {
         cards: { maos: "48.117", lucro: "+$1.758", bb100: "3.48", rakeback: "$320", bankroll: "$6.400" },
         // Exemplo: Meta de julho era 50k hands, 130 horas e jogou 125h
-        metas: { alvoMaos: 50000, horasJogadas: 125, alvoHoras: 130 },
+        metas: { alvoMaos: 50000, horasJogadas: 83.35, alvoHoras: 100 },
         charts: {
           lucroLinha: [500, 900, 1200, 1400, 1758],
           bankrollLinha: [3800, 4600, 5200, 5800, 6400],
@@ -177,6 +162,22 @@
             maos: [35000, 42000, 58000, 61000, 48117], 
             lucro: [600, 950, 1400, 1100, 1758], 
             bb100: [3.5, 4.5, 6.0, 4.8, 3.48] 
+          }
+        }
+      },
+      "Agosto 2026": {
+        cards: { maos: "0", lucro: "+$0", bb100: "0", rakeback: "$0", bankroll: "$0" },
+        // Agora você informa qual era a meta e quanto já jogou em horas
+        metas: { alvoMaos: 0, horasJogadas: 0, alvoHoras: 100 },
+        charts: {
+          lucroLinha: [950, 1400, 1100, 1650, 1824],
+          bankrollLinha: [4200, 5100, 5800, 6400, 7415],
+          limites: { maos: [15000, 28000, 13240], bb100: [9.8, 6.3, 4.7] },
+          volume: { 
+            labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
+            maos: [42000, 58000, 61000, 53000, 56240], 
+            lucro: [950, 1400, 1100, 1650, 1824], 
+            bb100: [4.5, 6.0, 4.8, 7.8, 6.35] 
           }
         }
       },
