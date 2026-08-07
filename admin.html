@@ -55,13 +55,13 @@
           <input type="number" id="alvo_maos" class="input-field" required>
         </div>
         <div>
-  <label class="text-sm text-gray-400">Horas Jogadas</label>
-  <input type="number" step="0.01" id="horas_jogadas" class="input-field" required>
-</div>
-<div>
-  <label class="text-sm text-gray-400">Meta de Horas</label>
-  <input type="number" step="0.01" id="alvo_horas" class="input-field" required>
-</div>
+          <label class="text-sm text-gray-400">Horas Jogadas</label>
+          <input type="number" step="0.01" id="horas_jogadas" class="input-field" required>
+        </div>
+        <div>
+          <label class="text-sm text-gray-400">Meta de Horas</label>
+          <input type="number" step="0.01" id="alvo_horas" class="input-field" required>
+        </div>
       </div>
 
       <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg transition-colors mt-4">
@@ -73,16 +73,21 @@
   </div>
 
   <script>
+    // As suas chaves de API
     const supabaseUrl = 'https://zhgnlcwdagxzphhqbkjp.supabase.co'; 
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoZ25sY3dkYWd4enBoaHFia2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjI1MzcsImV4cCI6MjEwMTYzODUzN30.QRDhAK8wQorNhUwFEV4lWx6BKKlbjoVXpa3ewh3j6qc';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    
+    // Inicia a conexão
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
+    // Quando clicar no botão de Salvar
     document.getElementById('adminForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
+      e.preventDefault(); // Impede a página de recarregar e apagar tudo!
       
       const msg = document.getElementById('mensagem');
       msg.classList.remove('hidden', 'text-green-400', 'text-red-400');
-      msg.innerText = 'Salvando...';
+      msg.classList.add('text-blue-400');
+      msg.innerText = 'Salvando dados no Supabase...';
 
       // Capturando os dados do formulário
       const dados = {
@@ -94,13 +99,16 @@
         bankroll: parseFloat(document.getElementById('bankroll').value),
         alvo_maos: parseInt(document.getElementById('alvo_maos').value),
         horas_jogadas: parseFloat(document.getElementById('horas_jogadas').value),
-alvo_horas: parseFloat(document.getElementById('alvo_horas').value)
+        alvo_horas: parseFloat(document.getElementById('alvo_horas').value)
       };
 
       // Enviando para a tabela 'poker_stats' no Supabase
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('poker_stats')
         .upsert([dados], { onConflict: 'mes_ano' }); // Atualiza se o mês já existir
+
+      // Removendo a cor azul de "Salvando..."
+      msg.classList.remove('text-blue-400');
 
       if (error) {
         msg.classList.add('text-red-400');
