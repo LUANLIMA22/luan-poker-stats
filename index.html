@@ -90,7 +90,7 @@
         </div>
       </div>
       <div class="card rounded-xl p-6">
-        <h2 class="text-xl font-semibold mb-4">Mãos nos Últimos Meses</h2>
+        <h2 class="text-xl font-semibold mb-4">Mãos nos Últimos 6 Meses</h2>
         <div class="relative h-64">
           <canvas id="handsChart"></canvas>
         </div>
@@ -148,20 +148,11 @@
     Chart.defaults.color = "#A1A1AA";
     Chart.defaults.borderColor = "#27272A";
 
-    // Banco de Dados Local para os gráficos secundários
+    // Banco de Dados Local SOMENTE para os Limites
     const dadosGraficos = {
-      "Julho 2026": {
-        limites: { maos: [12000, 22000, 14117], bb100: [4.2, 3.1, 3.48] },
-        volume: { labels: ["Mar", "Abr", "Mai", "Jun", "Jul"], maos: [35000, 42000, 58000, 61000, 48117], lucro: [600, 950, 1400, 1100, 1758], bb100: [3.5, 4.5, 6.0, 4.8, 3.48] }
-      },
-      "Agosto 2026": {
-        limites: { maos: [15000, 28000, 13240], bb100: [9.8, 6.3, 4.7] },
-        volume: { labels: ["Abr", "Mai", "Jun", "Jul", "Ago"], maos: [42000, 58000, 61000, 53000, 56240], lucro: [950, 1400, 1100, 1650, 1824], bb100: [4.5, 6.0, 4.8, 7.8, 6.35] }
-      },
-      "Setembro 2026": {
-        limites: { maos: [0, 0, 0], bb100: [0, 0, 0] },
-        volume: { labels: ["Mai", "Jun", "Jul", "Ago", "Set"], maos: [58000, 61000, 53000, 56240, 0], lucro: [1400, 1100, 1650, 1824, 0], bb100: [6.0, 4.8, 7.8, 6.35, 0] }
-      }
+      "Julho 2026": { limites: { maos: [12000, 22000, 14117], bb100: [4.2, 3.1, 3.48] } },
+      "Agosto 2026": { limites: { maos: [15000, 28000, 13240], bb100: [9.8, 6.3, 4.7] } },
+      "Setembro 2026": { limites: { maos: [0, 0, 0], bb100: [0, 0, 0] } }
     };
 
     const supabaseUrl = 'https://zhgnlcwdagxzphhqbkjp.supabase.co'; 
@@ -179,7 +170,7 @@
       });
 
       handsChart = new Chart(document.getElementById('handsChart'), { 
-        type: 'bar', data: { labels: ["1","2","3","4","5"], datasets: [{ data: [0,0,0,0,0], backgroundColor: "#3B82F6", barThickness: 24 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: "#3B82F6", barThickness: 24 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
       });
 
       anualChart = new Chart(document.getElementById('anualChart'), {
@@ -187,12 +178,8 @@
         data: {
           labels: [],
           datasets: [
-            {
-              type: 'line', label: 'Lucro ($)', data: [], borderColor: '#22C55E', backgroundColor: '#22C55E', borderWidth: 3, yAxisID: 'yLucro', tension: 0.3
-            },
-            {
-              type: 'bar', label: 'Mãos', data: [], backgroundColor: 'rgba(59, 130, 246, 0.6)', borderRadius: 4, yAxisID: 'yMaos'
-            }
+            { type: 'line', label: 'Lucro ($)', data: [], borderColor: '#22C55E', backgroundColor: '#22C55E', borderWidth: 3, yAxisID: 'yLucro', tension: 0.3 },
+            { type: 'bar', label: 'Mãos', data: [], backgroundColor: 'rgba(59, 130, 246, 0.6)', borderRadius: 4, yAxisID: 'yMaos' }
           ]
         },
         options: {
@@ -212,22 +199,23 @@
       const aviso = document.getElementById('aviso-erro');
       aviso.classList.add('hidden');
 
-      // 1. Atualizar Gráficos Locais
+      // 1. Atualizar Mãos Por Limite (Manual - Se existir)
       const dataGraficos = dadosGraficos[mesSelecionado];
-      if (dataGraficos) {
+      if (dataGraficos && dataGraficos.limites) {
         stakesChart.data.datasets[0].data = dataGraficos.limites.maos; stakesChart.update();
-        handsChart.data.labels = dataGraficos.volume.labels;
-        handsChart.data.datasets[0].data = dataGraficos.volume.maos; handsChart.update();
+      } else {
+        stakesChart.data.datasets[0].data = [0,0,0]; stakesChart.update();
       }
 
-      // 2. BUSCAR TODOS OS MESES NO SUPABASE (Para o Gráfico Anual Automático)
+      // 2. BUSCAR TODOS OS MESES NO SUPABASE (Para Gráfico Anual e Últimos 6 Meses)
       const { data: todosDados, error: errTodos } = await supabaseClient
         .from('poker_stats')
-        .select('mes_ano, maos_jogadas, lucro');
+        .select('mes_ano, maos_jogadas, lucro, bb_100');
 
       if (!errTodos && todosDados) {
         const mesesOrdem = { "Janeiro": 1, "Fevereiro": 2, "Março": 3, "Abril": 4, "Maio": 5, "Junho": 6, "Julho": 7, "Agosto": 8, "Setembro": 9, "Outubro": 10, "Novembro": 11, "Dezembro": 12 };
         
+        // Ordena os meses em ordem cronológica
         todosDados.sort((a, b) => {
           let partsA = a.mes_ano.split(' ');
           let partsB = b.mes_ano.split(' ');
@@ -235,17 +223,15 @@
           return (mesesOrdem[partsA[0]] || 0) - (mesesOrdem[partsB[0]] || 0);
         });
 
+        // --- ATUALIZAR GRÁFICO ANUAL ---
         let somaMaos = 0, somaLucro = 0;
         let labelsAno = [], maosAno = [], lucroAno = [];
 
         todosDados.forEach(d => {
           somaMaos += (d.maos_jogadas || 0);
           somaLucro += (d.lucro || 0);
-          
           let partes = d.mes_ano.split(' ');
-          let labelCurto = partes.length === 2 ? partes[0].substring(0,3) + '/' + partes[1].substring(2,4) : d.mes_ano;
-          
-          labelsAno.push(labelCurto);
+          labelsAno.push(partes.length === 2 ? partes[0].substring(0,3) + '/' + partes[1].substring(2,4) : d.mes_ano);
           maosAno.push(d.maos_jogadas || 0);
           lucroAno.push(d.lucro || 0);
         });
@@ -259,6 +245,39 @@
         anualChart.data.datasets[0].data = lucroAno;
         anualChart.data.datasets[1].data = maosAno;
         anualChart.update();
+
+        // --- ATUALIZAR GRÁFICO 6 MESES (AUTOMÁTICO) ---
+        let selectedIdx = todosDados.findIndex(d => d.mes_ano === mesSelecionado);
+        let ultimos6 = [];
+        
+        if (selectedIdx !== -1) {
+          // Pega os 6 meses incluindo o mês selecionado
+          let startIdx = Math.max(0, selectedIdx - 5);
+          ultimos6 = todosDados.slice(startIdx, selectedIdx + 1);
+        } else {
+          // Se o mês selecionado não existir no banco, exibe os últimos 6 cadastrados no geral
+          ultimos6 = todosDados.slice(-6);
+        }
+
+        handsChart.data.labels = ultimos6.map(d => d.mes_ano.split(' ')[0].substring(0,3));
+        handsChart.data.datasets[0].data = ultimos6.map(d => d.maos_jogadas || 0);
+        
+        // Tooltip rica para o gráfico de 6 meses
+        handsChart.options.plugins.tooltip = {
+          displayColors: false,
+          callbacks: {
+            label: function(context) {
+              let idx = context.dataIndex;
+              let d = ultimos6[idx];
+              return [
+                `🟦 Mãos: ${formatarNumero(d.maos_jogadas)}`,
+                `🟩 Lucro: ${formatarMoeda(d.lucro)}`,
+                `🟩 Winrate: ${d.bb_100} BB/100`
+              ];
+            }
+          }
+        };
+        handsChart.update();
       }
 
       // 3. Atualizar Cards e Metas do Mês Selecionado (Do Supabase)
