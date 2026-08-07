@@ -317,13 +317,13 @@
       document.getElementById('seletorMes').addEventListener('change', atualizarPainel);
     };
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   Chart.defaults.color = "#A1A1AA";
   Chart.defaults.borderColor = "#27272A";
 
-  // ⚠️ SUBSTITUA PELA SUA URL DO SUPABASE AQUI TAMBÉM
-  const supabaseUrl = 'COLOQUE_SUA_URL_AQUI'; 
-  const supabaseKey = 'sb_publishable_onKf3q3Lzdbh0rfVPgqZ6Q_5GYA6O_B';
+  const supabaseUrl = 'https://zhgnlcwdagxzphhqbkjp.supabase.co'; 
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoZ25sY3dkYWd4enBoaHFia2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjI1MzcsImV4cCI6MjEwMTYzODUzN30.QRDhAK8wQorNhUwFEV4lWx6BKKlbjoVXpa3ewh3j6qc';
   const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
   // Variáveis para os gráficos
@@ -375,7 +375,6 @@
   }
 
   function criarGraficosBase() {
-    // Mantendo os gráficos visuais vazios ou com dados padrão (podem ser automatizados futuramente)
     profitChart = new Chart(document.getElementById('profitChart'), { type: 'line', data: { labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem"], datasets: [{ label: "Lucro ($)", data: [0, 0, 0, 0], borderColor: "#22C55E", backgroundColor: "rgba(34, 197, 94, 0.2)", fill: true, tension: 0.35 }] }});
     bankrollChart = new Chart(document.getElementById('bankrollChart'), { type: 'line', data: { labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem"], datasets: [{ label: "Bankroll ($)", data: [0, 0, 0, 0], borderColor: "#8B5CF6", backgroundColor: "rgba(139, 92, 246, 0.2)", fill: true, tension: 0.35 }] }});
     stakesChart = new Chart(document.getElementById('stakesChart'), { type: 'bar', data: { labels: ["NL25", "NL50", "NL100"], datasets: [{ data: [0, 0, 0], backgroundColor: "#3B82F6", barThickness: 32 }] }, options: { plugins: { legend: { display: false } } }});
