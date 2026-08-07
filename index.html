@@ -316,6 +316,78 @@
       atualizarPainel();
       document.getElementById('seletorMes').addEventListener('change', atualizarPainel);
     };
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  Chart.defaults.color = "#A1A1AA";
+  Chart.defaults.borderColor = "#27272A";
+
+  // ⚠️ SUBSTITUA PELA SUA URL DO SUPABASE AQUI TAMBÉM
+  const supabaseUrl = 'COLOQUE_SUA_URL_AQUI'; 
+  const supabaseKey = 'sb_publishable_onKf3q3Lzdbh0rfVPgqZ6Q_5GYA6O_B';
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  // Variáveis para os gráficos
+  let profitChart, bankrollChart, stakesChart, handsChart;
+
+  // Função para formatar moeda
+  const formatarMoeda = (valor) => (valor >= 0 ? "+$" : "-$") + Math.abs(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  
+  // Função para formatar número
+  const formatarNumero = (valor) => valor.toLocaleString('pt-BR');
+
+  // Buscar dados no Supabase e atualizar a tela
+  async function carregarDadosDoBanco() {
+    const mesSelecionado = document.getElementById('seletorMes').value;
+    
+    // Busca a linha específica do mês selecionado na tabela poker_stats
+    const { data, error } = await supabase
+      .from('poker_stats')
+      .select('*')
+      .eq('mes_ano', mesSelecionado)
+      .single();
+
+    if (error || !data) {
+      console.log("Sem dados para este mês ou erro na conexão.");
+      return;
+    }
+
+    // 1. Atualizar Cards Dinamicamente
+    document.getElementById('card-maos').innerText = formatarNumero(data.maos_jogadas);
+    
+    const cardLucro = document.getElementById('card-lucro');
+    cardLucro.innerText = formatarMoeda(data.lucro);
+    cardLucro.className = data.lucro < 0 ? "text-3xl font-bold text-red-400 mt-2" : "text-3xl font-bold text-green-400 mt-2";
+    
+    document.getElementById('card-bb100').innerText = data.bb_100;
+    document.getElementById('card-rakeback').innerText = "$" + formatarNumero(data.rakeback);
+    document.getElementById('card-bankroll').innerText = "$" + formatarNumero(data.bankroll);
+
+    // 2. Atualizar Metas Automaticamente
+    const pctMaos = Math.round((data.maos_jogadas / data.alvo_maos) * 100) || 0;
+    document.getElementById('meta-maos-valores').innerText = `${formatarNumero(data.maos_jogadas)} / ${formatarNumero(data.alvo_maos)}`;
+    document.getElementById('meta-maos-texto').innerText = pctMaos + "%";
+    document.getElementById('meta-maos-barra').style.width = Math.min(pctMaos, 100) + "%";
+
+    const pctHoras = Math.round((data.horas_jogadas / data.alvo_horas) * 100) || 0;
+    document.getElementById('meta-horas-valores').innerText = `${data.horas_jogadas}h / ${data.alvo_horas}h`;
+    document.getElementById('meta-horas-texto').innerText = pctHoras + "%";
+    document.getElementById('meta-horas-barra').style.width = Math.min(pctHoras, 100) + "%";
+  }
+
+  function criarGraficosBase() {
+    // Mantendo os gráficos visuais vazios ou com dados padrão (podem ser automatizados futuramente)
+    profitChart = new Chart(document.getElementById('profitChart'), { type: 'line', data: { labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem"], datasets: [{ label: "Lucro ($)", data: [0, 0, 0, 0], borderColor: "#22C55E", backgroundColor: "rgba(34, 197, 94, 0.2)", fill: true, tension: 0.35 }] }});
+    bankrollChart = new Chart(document.getElementById('bankrollChart'), { type: 'line', data: { labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem"], datasets: [{ label: "Bankroll ($)", data: [0, 0, 0, 0], borderColor: "#8B5CF6", backgroundColor: "rgba(139, 92, 246, 0.2)", fill: true, tension: 0.35 }] }});
+    stakesChart = new Chart(document.getElementById('stakesChart'), { type: 'bar', data: { labels: ["NL25", "NL50", "NL100"], datasets: [{ data: [0, 0, 0], backgroundColor: "#3B82F6", barThickness: 32 }] }, options: { plugins: { legend: { display: false } } }});
+    handsChart = new Chart(document.getElementById('handsChart'), { type: 'bar', data: { labels: ["Meses"], datasets: [{ data: [0], backgroundColor: "#3B82F6", barThickness: 24 }] }, options: { plugins: { legend: { display: false } } }});
+  }
+
+  window.onload = function() {
+    criarGraficosBase();
+    carregarDadosDoBanco();
+    document.getElementById('seletorMes').addEventListener('change', carregarDadosDoBanco);
+  };
+</script>
   </script>
 
 </body>
