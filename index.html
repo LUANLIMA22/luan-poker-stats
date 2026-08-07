@@ -8,6 +8,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -45,7 +46,7 @@
         <option value="Novembro 2026">Novembro 2026</option>
         <option value="Outubro 2026">Outubro 2026</option>
         <option value="Setembro 2026">Setembro 2026</option>
-        <option value="Agosto 2026" >Agosto 2026</option>
+        <option value="Agosto 2026">Agosto 2026</option>
         <option value="Julho 2026" selected>Julho 2026</option>
       </select>
     </div>
@@ -54,27 +55,27 @@
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
       <div class="card rounded-xl p-6">
         <p class="text-gray-400 text-sm">Mãos</p>
-        <h2 id="card-maos" class="text-3xl font-bold mt-2">56.240</h2>
+        <h2 id="card-maos" class="text-3xl font-bold mt-2">0</h2>
       </div>
 
       <div class="card rounded-xl p-6">
         <p class="text-gray-400 text-sm">Lucro</p>
-        <h2 id="card-lucro" class="text-3xl font-bold text-green-400 mt-2">+$1.824</h2>
+        <h2 id="card-lucro" class="text-3xl font-bold text-green-400 mt-2">+$0</h2>
       </div>
 
       <div class="card rounded-xl p-6">
         <p class="text-gray-400 text-sm">BB/100</p>
-        <h2 id="card-bb100" class="text-3xl font-bold text-cyan-400 mt-2">6.35</h2>
+        <h2 id="card-bb100" class="text-3xl font-bold text-cyan-400 mt-2">0</h2>
       </div>
 
       <div class="card rounded-xl p-6">
         <p class="text-gray-400 text-sm">Rakeback</p>
-        <h2 id="card-rakeback" class="text-3xl font-bold text-yellow-400 mt-2">$412</h2>
+        <h2 id="card-rakeback" class="text-3xl font-bold text-yellow-400 mt-2">$0</h2>
       </div>
 
       <div class="card rounded-xl p-6 col-span-2 md:col-span-1">
         <p class="text-gray-400 text-sm">Bankroll</p>
-        <h2 id="card-bankroll" class="text-3xl font-bold text-purple-400 mt-2">$7.415</h2>
+        <h2 id="card-bankroll" class="text-3xl font-bold text-purple-400 mt-2">$0</h2>
       </div>
     </div>
 
@@ -117,7 +118,7 @@
               <span class="font-semibold">Mãos</span>
               <span id="meta-maos-texto" class="text-green-400 font-bold">0%</span>
             </div>
-            <div id="meta-maos-valores" class="text-xs text-gray-400 mb-2">50.000 / 0</div>
+            <div id="meta-maos-valores" class="text-xs text-gray-400 mb-2">0 / 0</div>
             <div class="bg-zinc-700 h-3 rounded overflow-hidden">
               <div id="meta-maos-barra" class="bg-green-500 h-3 rounded w-0 transition-all duration-500"></div>
             </div>
@@ -129,7 +130,7 @@
               <span class="font-semibold">Horas</span>
               <span id="meta-horas-texto" class="text-blue-400 font-bold">0%</span>
             </div>
-            <div id="meta-horas-valores" class="text-xs text-gray-400 mb-2">h / 0h</div>
+            <div id="meta-horas-valores" class="text-xs text-gray-400 mb-2">0h / 0h</div>
             <div class="bg-zinc-700 h-3 rounded overflow-hidden">
               <div id="meta-horas-barra" class="bg-blue-500 h-3 rounded w-0 transition-all duration-500"></div>
             </div>
@@ -145,248 +146,83 @@
     Chart.defaults.color = "#A1A1AA";
     Chart.defaults.borderColor = "#27272A";
 
-    // --- BANCO DE DADOS DOS MESES ---
-    // Preencha seus resultados e metas reais aqui!
-    const dadosDosMeses = {
-      
-      "Julho 2026": {
-        cards: { maos: "48.117", lucro: "+$1.758", bb100: "3.48", rakeback: "$320", bankroll: "$6.400" },
-        // Exemplo: Meta de julho era 50k hands, 130 horas e jogou 125h
-        metas: { alvoMaos: 50000, horasJogadas: 83.35, alvoHoras: 100 },
-        charts: {
-          lucroLinha: [500, 900, 1200, 1400, 1758],
-          bankrollLinha: [3800, 4600, 5200, 5800, 6400],
-          limites: { maos: [12000, 22000, 14117], bb100: [4.2, 3.1, 3.48] },
-          volume: { 
-            labels: ["Mar", "Abr", "Mai", "Jun", "Jul"],
-            maos: [35000, 42000, 58000, 61000, 48117], 
-            lucro: [600, 950, 1400, 1100, 1758], 
-            bb100: [3.5, 4.5, 6.0, 4.8, 3.48] 
-          }
-        }
-      },
-      "Agosto 2026": {
-        cards: { maos: "0", lucro: "+$0", bb100: "0", rakeback: "$0", bankroll: "$0" },
-        // Agora você informa qual era a meta e quanto já jogou em horas
-        metas: { alvoMaos: 0, horasJogadas: 0, alvoHoras: 100 },
-        charts: {
-          lucroLinha: [950, 1400, 1100, 1650, 1824],
-          bankrollLinha: [4200, 5100, 5800, 6400, 7415],
-          limites: { maos: [15000, 28000, 13240], bb100: [9.8, 6.3, 4.7] },
-          volume: { 
-            labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
-            maos: [42000, 58000, 61000, 53000, 56240], 
-            lucro: [950, 1400, 1100, 1650, 1824], 
-            bb100: [4.5, 6.0, 4.8, 7.8, 6.35] 
-          }
-        }
-      },
-      "Setembro 2026": {
-        cards: { maos: "0", lucro: "$0", bb100: "0.0", rakeback: "$0", bankroll: "$7.415" },
-        metas: { alvoMaos: 60000, horasJogadas: 0, alvoHoras: 140 },
-        charts: {
-          lucroLinha: [0, 0, 0, 0, 0],
-          bankrollLinha: [7415, 7415, 7415, 7415, 7415],
-          limites: { maos: [0, 0, 0], bb100: [0, 0, 0] },
-          volume: { 
-            labels: ["Mai", "Jun", "Jul", "Ago", "Set"],
-            maos: [58000, 61000, 53000, 56240, 0], 
-            lucro: [1400, 1100, 1650, 1824, 0], 
-            bb100: [6.0, 4.8, 7.8, 6.35, 0] 
-          }
-        }
-      }
-    };
+    // Conexão com o Supabase
+    const supabaseUrl = 'https://zhgnlcwdagxzphhqbkjp.supabase.co'; 
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoZ25sY3dkYWd4enBoaHFia2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjI1MzcsImV4cCI6MjEwMTYzODUzN30.QRDhAK8wQorNhUwFEV4lWx6BKKlbjoVXpa3ewh3j6qc';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+    // Variáveis para os gráficos
     let profitChart, bankrollChart, stakesChart, handsChart;
 
-    function criarGraficosBase() {
-      // Cria a base vazia dos gráficos para depois ser preenchida via atualizarPainel()
-      profitChart = new Chart(document.getElementById('profitChart'), {
-        type: 'line', data: { labels: [], datasets: [{ label: "Lucro Mensal ($)", data: [], borderColor: "#22C55E", backgroundColor: "rgba(34, 197, 94, 0.2)", fill: true, tension: 0.35 }] }
-      });
+    // Função para formatar moeda
+    const formatarMoeda = (valor) => (valor >= 0 ? "+$" : "-$") + Math.abs(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    
+    // Função para formatar número
+    const formatarNumero = (valor) => valor.toLocaleString('pt-BR');
 
-      bankrollChart = new Chart(document.getElementById('bankrollChart'), {
-        type: 'line', data: { labels: [], datasets: [{ label: "Bankroll ($)", data: [], borderColor: "#8B5CF6", backgroundColor: "rgba(139, 92, 246, 0.2)", fill: true, tension: 0.35 }] }
-      });
-
-      stakesChart = new Chart(document.getElementById('stakesChart'), {
-        type: 'bar', data: { labels: ["NL25", "NL50", "NL100"], datasets: [{ data: [], backgroundColor: "#3B82F6", barThickness: 32 }] },
-        options: {
-          responsive: true, maintainAspectRatio: false, plugins: {
-            legend: { display: false },
-            tooltip: {
-              displayColors: false,
-              callbacks: {
-                label: function (context) {
-                  const mesSelecionado = document.getElementById('seletorMes').value;
-                  const dadosLimites = dadosDosMeses[mesSelecionado].charts.limites;
-                  const index = context.dataIndex;
-                  return [`🟦 Mãos: ${context.raw.toLocaleString()}`, `🟩 Winrate: ${dadosLimites.bb100[index]} BB/100`];
-                }
-              }
-            }
-          }
-        }
-      });
-
-      handsChart = new Chart(document.getElementById('handsChart'), {
-        type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: "#3B82F6", barThickness: 24 }] },
-        options: {
-          responsive: true, maintainAspectRatio: false, plugins: {
-            legend: { display: false },
-            tooltip: {
-              displayColors: false,
-              callbacks: {
-                label: function (context) {
-                  const mesSelecionado = document.getElementById('seletorMes').value;
-                  const dadosVolume = dadosDosMeses[mesSelecionado].charts.volume;
-                  const index = context.dataIndex;
-                  return [
-                    `🟦 Mãos: ${context.raw.toLocaleString()}`,
-                    `🟩 Lucro: $${dadosVolume.lucro[index].toLocaleString()}`,
-                    `🟩 Winrate: ${dadosVolume.bb100[index]} BB/100`
-                  ];
-                }
-              }
-            }
-          }
-        }
-      });
-    }
-
-    function atualizarPainel() {
+    // Buscar dados no Supabase e atualizar a tela
+    async function carregarDadosDoBanco() {
       const mesSelecionado = document.getElementById('seletorMes').value;
-      const data = dadosDosMeses[mesSelecionado];
-      if (!data) return;
+      
+      // Busca a linha específica do mês selecionado na tabela poker_stats
+      const { data, error } = await supabase
+        .from('poker_stats')
+        .select('*')
+        .eq('mes_ano', mesSelecionado)
+        .single();
 
-      // 1. Atualizar Cards
-      document.getElementById('card-maos').innerText = data.cards.maos;
+      if (error || !data) {
+        console.log("Sem dados para este mês ou erro na conexão.");
+        // Zera a tela caso não tenha dados daquele mês ainda
+        document.getElementById('card-maos').innerText = '0';
+        document.getElementById('card-lucro').innerText = '$0';
+        document.getElementById('card-bb100').innerText = '0';
+        document.getElementById('card-rakeback').innerText = '$0';
+        document.getElementById('card-bankroll').innerText = '$0';
+        document.getElementById('meta-maos-valores').innerText = `0 / 0`;
+        document.getElementById('meta-maos-texto').innerText = "0%";
+        document.getElementById('meta-maos-barra').style.width = "0%";
+        document.getElementById('meta-horas-valores').innerText = `0h / 0h`;
+        document.getElementById('meta-horas-texto').innerText = "0%";
+        document.getElementById('meta-horas-barra').style.width = "0%";
+        return;
+      }
+
+      // 1. Atualizar Cards Dinamicamente
+      document.getElementById('card-maos').innerText = formatarNumero(data.maos_jogadas);
       
       const cardLucro = document.getElementById('card-lucro');
-      cardLucro.innerText = data.cards.lucro;
-      cardLucro.className = data.cards.lucro.includes("-") ? "text-3xl font-bold text-red-400 mt-2" : "text-3xl font-bold text-green-400 mt-2";
+      cardLucro.innerText = formatarMoeda(data.lucro);
+      cardLucro.className = data.lucro < 0 ? "text-3xl font-bold text-red-400 mt-2" : "text-3xl font-bold text-green-400 mt-2";
       
-      document.getElementById('card-bb100').innerText = data.cards.bb100;
-      document.getElementById('card-rakeback').innerText = data.cards.rakeback;
-      document.getElementById('card-bankroll').innerText = data.cards.bankroll;
+      document.getElementById('card-bb100').innerText = data.bb_100;
+      document.getElementById('card-rakeback').innerText = "$" + formatarNumero(data.rakeback);
+      document.getElementById('card-bankroll').innerText = "$" + formatarNumero(data.bankroll);
 
-      // 2. Atualizar e Calcular Metas Automaticamente
-      
-      // Cálculo de Mãos (Puxa os dados do card e remove os pontos para virar número puro)
-      const maosJogadas = parseInt(data.cards.maos.replace(/\./g, '')) || 0;
-      const alvoMaos = data.metas.alvoMaos || 1;
-      const pctMaosReal = Math.round((maosJogadas / alvoMaos) * 100);
-      const larguraBarraMaos = Math.min(pctMaosReal, 100); // Limita a barra visual a 100%
+      // 2. Atualizar Metas Automaticamente
+      const pctMaos = Math.round((data.maos_jogadas / data.alvo_maos) * 100) || 0;
+      document.getElementById('meta-maos-valores').innerText = `${formatarNumero(data.maos_jogadas)} / ${formatarNumero(data.alvo_maos)}`;
+      document.getElementById('meta-maos-texto').innerText = pctMaos + "%";
+      document.getElementById('meta-maos-barra').style.width = Math.min(pctMaos, 100) + "%";
 
-      document.getElementById('meta-maos-valores').innerText = `${maosJogadas.toLocaleString('pt-BR')} / ${alvoMaos.toLocaleString('pt-BR')}`;
-      document.getElementById('meta-maos-texto').innerText = pctMaosReal + "%";
-      document.getElementById('meta-maos-barra').style.width = larguraBarraMaos + "%";
-
-      // Cálculo de Horas
-      const horasJogadas = data.metas.horasJogadas || 0;
-      const alvoHoras = data.metas.alvoHoras || 1;
-      const pctHorasReal = Math.round((horasJogadas / alvoHoras) * 100);
-      const larguraBarraHoras = Math.min(pctHorasReal, 100);
-
-      document.getElementById('meta-horas-valores').innerText = `${horasJogadas}h / ${alvoHoras}h`;
-      document.getElementById('meta-horas-texto').innerText = pctHorasReal + "%";
-      document.getElementById('meta-horas-barra').style.width = larguraBarraHoras + "%";
-
-      // 3. Atualizar Gráficos
-      profitChart.data.labels = ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem", "Fim"];
-      profitChart.data.datasets[0].data = data.charts.lucroLinha;
-      profitChart.update();
-
-      bankrollChart.data.labels = ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem", "Fim"];
-      bankrollChart.data.datasets[0].data = data.charts.bankrollLinha;
-      bankrollChart.update();
-
-      stakesChart.data.datasets[0].data = data.charts.limites.maos;
-      stakesChart.update();
-
-      handsChart.data.labels = data.charts.volume.labels;
-      handsChart.data.datasets[0].data = data.charts.volume.maos;
-      handsChart.update();
+      const pctHoras = Math.round((data.horas_jogadas / data.alvo_horas) * 100) || 0;
+      document.getElementById('meta-horas-valores').innerText = `${data.horas_jogadas}h / ${data.alvo_horas}h`;
+      document.getElementById('meta-horas-texto').innerText = pctHoras + "%";
+      document.getElementById('meta-horas-barra').style.width = Math.min(pctHoras, 100) + "%";
     }
 
-    // Inicia tudo
+    function criarGraficosBase() {
+      profitChart = new Chart(document.getElementById('profitChart'), { type: 'line', data: { labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem"], datasets: [{ label: "Lucro ($)", data: [0, 0, 0, 0], borderColor: "#22C55E", backgroundColor: "rgba(34, 197, 94, 0.2)", fill: true, tension: 0.35 }] }});
+      bankrollChart = new Chart(document.getElementById('bankrollChart'), { type: 'line', data: { labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem"], datasets: [{ label: "Bankroll ($)", data: [0, 0, 0, 0], borderColor: "#8B5CF6", backgroundColor: "rgba(139, 92, 246, 0.2)", fill: true, tension: 0.35 }] }});
+      stakesChart = new Chart(document.getElementById('stakesChart'), { type: 'bar', data: { labels: ["NL25", "NL50", "NL100"], datasets: [{ data: [0, 0, 0], backgroundColor: "#3B82F6", barThickness: 32 }] }, options: { plugins: { legend: { display: false } } }});
+      handsChart = new Chart(document.getElementById('handsChart'), { type: 'bar', data: { labels: ["Meses"], datasets: [{ data: [0], backgroundColor: "#3B82F6", barThickness: 24 }] }, options: { plugins: { legend: { display: false } } }});
+    }
+
     window.onload = function() {
       criarGraficosBase();
-      atualizarPainel();
-      document.getElementById('seletorMes').addEventListener('change', atualizarPainel);
+      carregarDadosDoBanco();
+      document.getElementById('seletorMes').addEventListener('change', carregarDadosDoBanco);
     };
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  Chart.defaults.color = "#A1A1AA";
-  Chart.defaults.borderColor = "#27272A";
-
-  const supabaseUrl = 'https://zhgnlcwdagxzphhqbkjp.supabase.co'; 
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoZ25sY3dkYWd4enBoaHFia2pwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwNjI1MzcsImV4cCI6MjEwMTYzODUzN30.QRDhAK8wQorNhUwFEV4lWx6BKKlbjoVXpa3ewh3j6qc';
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-  // Variáveis para os gráficos
-  let profitChart, bankrollChart, stakesChart, handsChart;
-
-  // Função para formatar moeda
-  const formatarMoeda = (valor) => (valor >= 0 ? "+$" : "-$") + Math.abs(valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-  
-  // Função para formatar número
-  const formatarNumero = (valor) => valor.toLocaleString('pt-BR');
-
-  // Buscar dados no Supabase e atualizar a tela
-  async function carregarDadosDoBanco() {
-    const mesSelecionado = document.getElementById('seletorMes').value;
-    
-    // Busca a linha específica do mês selecionado na tabela poker_stats
-    const { data, error } = await supabase
-      .from('poker_stats')
-      .select('*')
-      .eq('mes_ano', mesSelecionado)
-      .single();
-
-    if (error || !data) {
-      console.log("Sem dados para este mês ou erro na conexão.");
-      return;
-    }
-
-    // 1. Atualizar Cards Dinamicamente
-    document.getElementById('card-maos').innerText = formatarNumero(data.maos_jogadas);
-    
-    const cardLucro = document.getElementById('card-lucro');
-    cardLucro.innerText = formatarMoeda(data.lucro);
-    cardLucro.className = data.lucro < 0 ? "text-3xl font-bold text-red-400 mt-2" : "text-3xl font-bold text-green-400 mt-2";
-    
-    document.getElementById('card-bb100').innerText = data.bb_100;
-    document.getElementById('card-rakeback').innerText = "$" + formatarNumero(data.rakeback);
-    document.getElementById('card-bankroll').innerText = "$" + formatarNumero(data.bankroll);
-
-    // 2. Atualizar Metas Automaticamente
-    const pctMaos = Math.round((data.maos_jogadas / data.alvo_maos) * 100) || 0;
-    document.getElementById('meta-maos-valores').innerText = `${formatarNumero(data.maos_jogadas)} / ${formatarNumero(data.alvo_maos)}`;
-    document.getElementById('meta-maos-texto').innerText = pctMaos + "%";
-    document.getElementById('meta-maos-barra').style.width = Math.min(pctMaos, 100) + "%";
-
-    const pctHoras = Math.round((data.horas_jogadas / data.alvo_horas) * 100) || 0;
-    document.getElementById('meta-horas-valores').innerText = `${data.horas_jogadas}h / ${data.alvo_horas}h`;
-    document.getElementById('meta-horas-texto').innerText = pctHoras + "%";
-    document.getElementById('meta-horas-barra').style.width = Math.min(pctHoras, 100) + "%";
-  }
-
-  function criarGraficosBase() {
-    profitChart = new Chart(document.getElementById('profitChart'), { type: 'line', data: { labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem"], datasets: [{ label: "Lucro ($)", data: [0, 0, 0, 0], borderColor: "#22C55E", backgroundColor: "rgba(34, 197, 94, 0.2)", fill: true, tension: 0.35 }] }});
-    bankrollChart = new Chart(document.getElementById('bankrollChart'), { type: 'line', data: { labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem"], datasets: [{ label: "Bankroll ($)", data: [0, 0, 0, 0], borderColor: "#8B5CF6", backgroundColor: "rgba(139, 92, 246, 0.2)", fill: true, tension: 0.35 }] }});
-    stakesChart = new Chart(document.getElementById('stakesChart'), { type: 'bar', data: { labels: ["NL25", "NL50", "NL100"], datasets: [{ data: [0, 0, 0], backgroundColor: "#3B82F6", barThickness: 32 }] }, options: { plugins: { legend: { display: false } } }});
-    handsChart = new Chart(document.getElementById('handsChart'), { type: 'bar', data: { labels: ["Meses"], datasets: [{ data: [0], backgroundColor: "#3B82F6", barThickness: 24 }] }, options: { plugins: { legend: { display: false } } }});
-  }
-
-  window.onload = function() {
-    criarGraficosBase();
-    carregarDadosDoBanco();
-    document.getElementById('seletorMes').addEventListener('change', carregarDadosDoBanco);
-  };
-</script>
   </script>
 
 </body>
