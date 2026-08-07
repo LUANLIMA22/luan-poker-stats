@@ -109,26 +109,32 @@
 
       <div class="card rounded-xl p-6">
         <h2 class="text-xl font-semibold mb-4">Metas</h2>
-        <div class="space-y-5">
+        <div class="space-y-6">
+          
+          <!-- Meta de Mãos -->
           <div>
-            <div class="flex justify-between mb-2 text-sm">
-              <span>Mãos</span>
-              <span id="meta-maos-texto">82%</span>
+            <div class="flex justify-between items-end mb-1">
+              <span class="font-semibold">Mãos</span>
+              <span id="meta-maos-texto" class="text-green-400 font-bold">0%</span>
             </div>
+            <div id="meta-maos-valores" class="text-xs text-gray-400 mb-2">50.000 / 0</div>
             <div class="bg-zinc-700 h-3 rounded overflow-hidden">
-              <div id="meta-maos-barra" class="bg-green-500 h-3 rounded w-[82%] transition-all duration-500"></div>
+              <div id="meta-maos-barra" class="bg-green-500 h-3 rounded w-0 transition-all duration-500"></div>
             </div>
           </div>
 
+          <!-- Meta de Horas -->
           <div>
-            <div class="flex justify-between mb-2 text-sm">
-              <span>Horas</span>
-              <span id="meta-horas-texto">61%</span>
+            <div class="flex justify-between items-end mb-1">
+              <span class="font-semibold">Horas</span>
+              <span id="meta-horas-texto" class="text-blue-400 font-bold">0%</span>
             </div>
+            <div id="meta-horas-valores" class="text-xs text-gray-400 mb-2">0h / 0h</div>
             <div class="bg-zinc-700 h-3 rounded overflow-hidden">
-              <div id="meta-horas-barra" class="bg-blue-500 h-3 rounded w-[61%] transition-all duration-500"></div>
+              <div id="meta-horas-barra" class="bg-blue-500 h-3 rounded w-0 transition-all duration-500"></div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -140,11 +146,12 @@
     Chart.defaults.borderColor = "#27272A";
 
     // --- BANCO DE DADOS DOS MESES ---
-    // É aqui que você vai preencher os dados dos próximos meses!
+    // Preencha seus resultados e metas reais aqui!
     const dadosDosMeses = {
       "Agosto 2026": {
         cards: { maos: "56.240", lucro: "+$1.824", bb100: "6.35", rakeback: "$412", bankroll: "$7.415" },
-        metas: { maos: "82", horas: "61" },
+        // Agora você informa qual era a meta e quanto já jogou em horas
+        metas: { alvoMaos: 60000, horasJogadas: 112, alvoHoras: 120 },
         charts: {
           lucroLinha: [950, 1400, 1100, 1650, 1824],
           bankrollLinha: [4200, 5100, 5800, 6400, 7415],
@@ -159,7 +166,8 @@
       },
       "Julho 2026": {
         cards: { maos: "48.117", lucro: "+$1.758", bb100: "3.48", rakeback: "$320", bankroll: "$6.400" },
-        metas: { maos: "100", horas: "95" },
+        // Exemplo: Meta de julho era 50k hands, 130 horas e jogou 125h
+        metas: { alvoMaos: 50000, horasJogadas: 125, alvoHoras: 130 },
         charts: {
           lucroLinha: [500, 900, 1200, 1400, 1758],
           bankrollLinha: [3800, 4600, 5200, 5800, 6400],
@@ -174,7 +182,7 @@
       },
       "Setembro 2026": {
         cards: { maos: "0", lucro: "$0", bb100: "0.0", rakeback: "$0", bankroll: "$7.415" },
-        metas: { maos: "0", horas: "0" },
+        metas: { alvoMaos: 60000, horasJogadas: 0, alvoHoras: 140 },
         charts: {
           lucroLinha: [0, 0, 0, 0, 0],
           bankrollLinha: [7415, 7415, 7415, 7415, 7415],
@@ -187,67 +195,33 @@
           }
         }
       }
-      // Você pode copiar o bloco de setembro e criar os de Outubro, Novembro e Dezembro aqui!
     };
 
-    // Variáveis globais para guardar a referência dos gráficos
     let profitChart, bankrollChart, stakesChart, handsChart;
 
-    // Função para inicializar os gráficos pela primeira vez
-    function inicializarGraficos() {
-      const dataAtual = dadosDosMeses["Agosto 2026"];
-
+    function criarGraficosBase() {
+      // Cria a base vazia dos gráficos para depois ser preenchida via atualizarPainel()
       profitChart = new Chart(document.getElementById('profitChart'), {
-        type: 'line',
-        data: {
-          labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem", "Fim"],
-          datasets: [{
-            label: "Lucro Mensal ($)",
-            data: dataAtual.charts.lucroLinha,
-            borderColor: "#22C55E",
-            backgroundColor: "rgba(34, 197, 94, 0.2)",
-            fill: true, tension: 0.35
-          }]
-        }
+        type: 'line', data: { labels: [], datasets: [{ label: "Lucro Mensal ($)", data: [], borderColor: "#22C55E", backgroundColor: "rgba(34, 197, 94, 0.2)", fill: true, tension: 0.35 }] }
       });
 
       bankrollChart = new Chart(document.getElementById('bankrollChart'), {
-        type: 'line',
-        data: {
-          labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem", "Fim"],
-          datasets: [{
-            label: "Bankroll ($)",
-            data: dataAtual.charts.bankrollLinha,
-            borderColor: "#8B5CF6",
-            backgroundColor: "rgba(139, 92, 246, 0.2)",
-            fill: true, tension: 0.35
-          }]
-        }
+        type: 'line', data: { labels: [], datasets: [{ label: "Bankroll ($)", data: [], borderColor: "#8B5CF6", backgroundColor: "rgba(139, 92, 246, 0.2)", fill: true, tension: 0.35 }] }
       });
 
       stakesChart = new Chart(document.getElementById('stakesChart'), {
-        type: 'bar',
-        data: {
-          labels: ["NL25", "NL50", "NL100"],
-          datasets: [{
-            data: dataAtual.charts.limites.maos,
-            backgroundColor: "#3B82F6", barThickness: 32
-          }]
-        },
+        type: 'bar', data: { labels: ["NL25", "NL50", "NL100"], datasets: [{ data: [], backgroundColor: "#3B82F6", barThickness: 32 }] },
         options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: {
+          responsive: true, maintainAspectRatio: false, plugins: {
             legend: { display: false },
             tooltip: {
               displayColors: false,
               callbacks: {
                 label: function (context) {
                   const mesSelecionado = document.getElementById('seletorMes').value;
-                  const dadosLimites = dadosDosMeses[mesSelecionado]?.charts.limites || dataAtual.charts.limites;
+                  const dadosLimites = dadosDosMeses[mesSelecionado].charts.limites;
                   const index = context.dataIndex;
-                  const handsVal = context.raw.toLocaleString();
-                  const bbVal = dadosLimites.bb100[index];
-                  return [`🟦 Mãos: ${handsVal}`, `🟩 Winrate: ${bbVal} BB/100`];
+                  return [`🟦 Mãos: ${context.raw.toLocaleString()}`, `🟩 Winrate: ${dadosLimites.bb100[index]} BB/100`];
                 }
               }
             }
@@ -256,32 +230,21 @@
       });
 
       handsChart = new Chart(document.getElementById('handsChart'), {
-        type: 'bar',
-        data: {
-          labels: dataAtual.charts.volume.labels,
-          datasets: [{
-            data: dataAtual.charts.volume.maos,
-            backgroundColor: "#3B82F6", barThickness: 24
-          }]
-        },
+        type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: "#3B82F6", barThickness: 24 }] },
         options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: {
+          responsive: true, maintainAspectRatio: false, plugins: {
             legend: { display: false },
             tooltip: {
               displayColors: false,
               callbacks: {
                 label: function (context) {
                   const mesSelecionado = document.getElementById('seletorMes').value;
-                  const dadosVolume = dadosDosMeses[mesSelecionado]?.charts.volume || dataAtual.charts.volume;
+                  const dadosVolume = dadosDosMeses[mesSelecionado].charts.volume;
                   const index = context.dataIndex;
-                  const handsVal = context.raw.toLocaleString();
-                  const profitVal = dadosVolume.lucro[index].toLocaleString();
-                  const bbVal = dadosVolume.bb100[index];
                   return [
-                    `🟦 Mãos: ${handsVal}`,
-                    `🟩 Lucro: $${profitVal}`,
-                    `🟩 Winrate: ${bbVal} BB/100`
+                    `🟦 Mãos: ${context.raw.toLocaleString()}`,
+                    `🟩 Lucro: $${dadosVolume.lucro[index].toLocaleString()}`,
+                    `🟩 Winrate: ${dadosVolume.bb100[index]} BB/100`
                   ];
                 }
               }
@@ -291,12 +254,9 @@
       });
     }
 
-    // Função que é chamada toda vez que o menu dropdown muda
     function atualizarPainel() {
       const mesSelecionado = document.getElementById('seletorMes').value;
       const data = dadosDosMeses[mesSelecionado];
-
-      // Se o mês não tiver dados cadastrados no JS, não faz nada
       if (!data) return;
 
       // 1. Atualizar Cards
@@ -304,28 +264,40 @@
       
       const cardLucro = document.getElementById('card-lucro');
       cardLucro.innerText = data.cards.lucro;
-      // Muda a cor do lucro para vermelho se for negativo, verde se positivo
-      if(data.cards.lucro.includes("-")) {
-        cardLucro.className = "text-3xl font-bold text-red-400 mt-2";
-      } else {
-        cardLucro.className = "text-3xl font-bold text-green-400 mt-2";
-      }
+      cardLucro.className = data.cards.lucro.includes("-") ? "text-3xl font-bold text-red-400 mt-2" : "text-3xl font-bold text-green-400 mt-2";
       
       document.getElementById('card-bb100').innerText = data.cards.bb100;
       document.getElementById('card-rakeback').innerText = data.cards.rakeback;
       document.getElementById('card-bankroll').innerText = data.cards.bankroll;
 
-      // 2. Atualizar Metas
-      document.getElementById('meta-maos-texto').innerText = data.metas.maos + "%";
-      document.getElementById('meta-maos-barra').style.width = data.metas.maos + "%";
+      // 2. Atualizar e Calcular Metas Automaticamente
       
-      document.getElementById('meta-horas-texto').innerText = data.metas.horas + "%";
-      document.getElementById('meta-horas-barra').style.width = data.metas.horas + "%";
+      // Cálculo de Mãos (Puxa os dados do card e remove os pontos para virar número puro)
+      const maosJogadas = parseInt(data.cards.maos.replace(/\./g, '')) || 0;
+      const alvoMaos = data.metas.alvoMaos || 1;
+      const pctMaosReal = Math.round((maosJogadas / alvoMaos) * 100);
+      const larguraBarraMaos = Math.min(pctMaosReal, 100); // Limita a barra visual a 100%
 
-      // 3. Atualizar Gráficos (animação automática do Chart.js)
+      document.getElementById('meta-maos-valores').innerText = `${maosJogadas.toLocaleString('pt-BR')} / ${alvoMaos.toLocaleString('pt-BR')}`;
+      document.getElementById('meta-maos-texto').innerText = pctMaosReal + "%";
+      document.getElementById('meta-maos-barra').style.width = larguraBarraMaos + "%";
+
+      // Cálculo de Horas
+      const horasJogadas = data.metas.horasJogadas || 0;
+      const alvoHoras = data.metas.alvoHoras || 1;
+      const pctHorasReal = Math.round((horasJogadas / alvoHoras) * 100);
+      const larguraBarraHoras = Math.min(pctHorasReal, 100);
+
+      document.getElementById('meta-horas-valores').innerText = `${horasJogadas}h / ${alvoHoras}h`;
+      document.getElementById('meta-horas-texto').innerText = pctHorasReal + "%";
+      document.getElementById('meta-horas-barra').style.width = larguraBarraHoras + "%";
+
+      // 3. Atualizar Gráficos
+      profitChart.data.labels = ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem", "Fim"];
       profitChart.data.datasets[0].data = data.charts.lucroLinha;
       profitChart.update();
 
+      bankrollChart.data.labels = ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem", "Fim"];
       bankrollChart.data.datasets[0].data = data.charts.bankrollLinha;
       bankrollChart.update();
 
@@ -337,11 +309,10 @@
       handsChart.update();
     }
 
-    // Inicializa a página
+    // Inicia tudo
     window.onload = function() {
-      inicializarGraficos();
-      
-      // Adiciona o "escutador" para mudar os dados quando escolher outro mês
+      criarGraficosBase();
+      atualizarPainel();
       document.getElementById('seletorMes').addEventListener('change', atualizarPainel);
     };
   </script>
