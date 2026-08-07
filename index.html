@@ -40,13 +40,13 @@
         </p>
       </div>
 
-      <select class="bg-zinc-800 text-white rounded-lg px-4 py-2 border border-zinc-700 outline-none">
-        <option>Dezembro 2026</option>
-        <option>Novembro 2026</option>
-        <option>Outubro 2026</option>
-        <option>Setembro 2026</option>
-        <option>Agosto 2026</option>
-        <option>Julho 2026</option>
+      <select id="seletorMes" class="bg-zinc-800 text-white rounded-lg px-4 py-2 border border-zinc-700 outline-none cursor-pointer">
+        <option value="Dezembro 2026">Dezembro 2026</option>
+        <option value="Novembro 2026">Novembro 2026</option>
+        <option value="Outubro 2026">Outubro 2026</option>
+        <option value="Setembro 2026">Setembro 2026</option>
+        <option value="Agosto 2026" selected>Agosto 2026</option>
+        <option value="Julho 2026">Julho 2026</option>
       </select>
     </div>
 
@@ -54,27 +54,27 @@
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
       <div class="card rounded-xl p-6">
         <p class="text-gray-400 text-sm">Mãos</p>
-        <h2 class="text-3xl font-bold mt-2">48.117</h2>
+        <h2 id="card-maos" class="text-3xl font-bold mt-2">56.240</h2>
       </div>
 
       <div class="card rounded-xl p-6">
         <p class="text-gray-400 text-sm">Lucro</p>
-        <h2 class="text-3xl font-bold text-green-400 mt-2">+$1.758</h2>
+        <h2 id="card-lucro" class="text-3xl font-bold text-green-400 mt-2">+$1.824</h2>
       </div>
 
       <div class="card rounded-xl p-6">
         <p class="text-gray-400 text-sm">BB/100</p>
-        <h2 class="text-3xl font-bold text-cyan-400 mt-2">3.48</h2>
+        <h2 id="card-bb100" class="text-3xl font-bold text-cyan-400 mt-2">6.35</h2>
       </div>
 
       <div class="card rounded-xl p-6">
         <p class="text-gray-400 text-sm">Rakeback</p>
-        <h2 class="text-3xl font-bold text-yellow-400 mt-2">$1.175</h2>
+        <h2 id="card-rakeback" class="text-3xl font-bold text-yellow-400 mt-2">$412</h2>
       </div>
 
       <div class="card rounded-xl p-6 col-span-2 md:col-span-1">
         <p class="text-gray-400 text-sm">Bankroll</p>
-        <h2 class="text-3xl font-bold text-purple-400 mt-2">$1.923</h2>
+        <h2 id="card-bankroll" class="text-3xl font-bold text-purple-400 mt-2">$7.415</h2>
       </div>
     </div>
 
@@ -113,20 +113,20 @@
           <div>
             <div class="flex justify-between mb-2 text-sm">
               <span>Mãos</span>
-              <span>82%</span>
+              <span id="meta-maos-texto">82%</span>
             </div>
             <div class="bg-zinc-700 h-3 rounded overflow-hidden">
-              <div class="bg-green-500 h-3 rounded w-[82%]"></div>
+              <div id="meta-maos-barra" class="bg-green-500 h-3 rounded w-[82%] transition-all duration-500"></div>
             </div>
           </div>
 
           <div>
             <div class="flex justify-between mb-2 text-sm">
               <span>Horas</span>
-              <span>61%</span>
+              <span id="meta-horas-texto">61%</span>
             </div>
             <div class="bg-zinc-700 h-3 rounded overflow-hidden">
-              <div class="bg-blue-500 h-3 rounded w-[61%]"></div>
+              <div id="meta-horas-barra" class="bg-blue-500 h-3 rounded w-[61%] transition-all duration-500"></div>
             </div>
           </div>
         </div>
@@ -139,79 +139,148 @@
     Chart.defaults.color = "#A1A1AA";
     Chart.defaults.borderColor = "#27272A";
 
-    // Gráfico de Lucro Mensal
-    const ctxProfit = document.getElementById('profitChart');
-    if (ctxProfit) {
-      new Chart(ctxProfit, {
+    // --- BANCO DE DADOS DOS MESES ---
+    // É aqui que você vai preencher os dados dos próximos meses!
+    const dadosDosMeses = {
+      "Agosto 2026": {
+        cards: { maos: "56.240", lucro: "+$1.824", bb100: "6.35", rakeback: "$412", bankroll: "$7.415" },
+        metas: { maos: "82", horas: "61" },
+        charts: {
+          lucroLinha: [950, 1400, 1100, 1650, 1824],
+          bankrollLinha: [4200, 5100, 5800, 6400, 7415],
+          limites: { maos: [15000, 28000, 13240], bb100: [9.8, 6.3, 4.7] },
+          volume: { 
+            labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
+            maos: [42000, 58000, 61000, 53000, 56240], 
+            lucro: [950, 1400, 1100, 1650, 1824], 
+            bb100: [4.5, 6.0, 4.8, 7.8, 6.35] 
+          }
+        }
+      },
+      "Julho 2026": {
+        cards: { maos: "48.117", lucro: "+$1.758", bb100: "3.48", rakeback: "$320", bankroll: "$6.400" },
+        metas: { maos: "100", horas: "95" },
+        charts: {
+          lucroLinha: [500, 900, 1200, 1400, 1758],
+          bankrollLinha: [3800, 4600, 5200, 5800, 6400],
+          limites: { maos: [12000, 22000, 14117], bb100: [4.2, 3.1, 3.48] },
+          volume: { 
+            labels: ["Mar", "Abr", "Mai", "Jun", "Jul"],
+            maos: [35000, 42000, 58000, 61000, 48117], 
+            lucro: [600, 950, 1400, 1100, 1758], 
+            bb100: [3.5, 4.5, 6.0, 4.8, 3.48] 
+          }
+        }
+      },
+      "Setembro 2026": {
+        cards: { maos: "0", lucro: "$0", bb100: "0.0", rakeback: "$0", bankroll: "$7.415" },
+        metas: { maos: "0", horas: "0" },
+        charts: {
+          lucroLinha: [0, 0, 0, 0, 0],
+          bankrollLinha: [7415, 7415, 7415, 7415, 7415],
+          limites: { maos: [0, 0, 0], bb100: [0, 0, 0] },
+          volume: { 
+            labels: ["Mai", "Jun", "Jul", "Ago", "Set"],
+            maos: [58000, 61000, 53000, 56240, 0], 
+            lucro: [1400, 1100, 1650, 1824, 0], 
+            bb100: [6.0, 4.8, 7.8, 6.35, 0] 
+          }
+        }
+      }
+      // Você pode copiar o bloco de setembro e criar os de Outubro, Novembro e Dezembro aqui!
+    };
+
+    // Variáveis globais para guardar a referência dos gráficos
+    let profitChart, bankrollChart, stakesChart, handsChart;
+
+    // Função para inicializar os gráficos pela primeira vez
+    function inicializarGraficos() {
+      const dataAtual = dadosDosMeses["Agosto 2026"];
+
+      profitChart = new Chart(document.getElementById('profitChart'), {
         type: 'line',
         data: {
-          labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
+          labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem", "Fim"],
           datasets: [{
             label: "Lucro Mensal ($)",
-            data: [950, 1400, 1100, 1650, 1824],
+            data: dataAtual.charts.lucroLinha,
             borderColor: "#22C55E",
             backgroundColor: "rgba(34, 197, 94, 0.2)",
-            fill: true,
-            tension: 0.35
+            fill: true, tension: 0.35
           }]
         }
       });
-    }
 
-    // Gráfico de Bankroll Mensal
-    const ctxBankroll = document.getElementById('bankrollChart');
-    if (ctxBankroll) {
-      new Chart(ctxBankroll, {
+      bankrollChart = new Chart(document.getElementById('bankrollChart'), {
         type: 'line',
         data: {
-          labels: ["Jul"],
+          labels: ["1ª Sem", "2ª Sem", "3ª Sem", "4ª Sem", "Fim"],
           datasets: [{
             label: "Bankroll ($)",
-            data: [1923],
+            data: dataAtual.charts.bankrollLinha,
             borderColor: "#8B5CF6",
             backgroundColor: "rgba(139, 92, 246, 0.2)",
-            fill: true,
-            tension: 0.35
+            fill: true, tension: 0.35
           }]
         }
       });
-    }
 
-    // Dados de suporte para os limites
-    const stakesData = {
-      labels: ["NL50", "NL100"],
-      hands: [48117],
-      bb100: [3.48]
-    };
-
-    // Gráfico de Mãos por Limite
-    const ctxStakes = document.getElementById('stakesChart');
-    if (ctxStakes) {
-      new Chart(ctxStakes, {
+      stakesChart = new Chart(document.getElementById('stakesChart'), {
         type: 'bar',
         data: {
-          labels: stakesData.labels,
+          labels: ["NL25", "NL50", "NL100"],
           datasets: [{
-            label: "Mãos",
-            data: stakesData.hands,
-            backgroundColor: "#3B82F6",
-            barThickness: 32
+            data: dataAtual.charts.limites.maos,
+            backgroundColor: "#3B82F6", barThickness: 32
           }]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
+          responsive: true, maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
             tooltip: {
-              displayColors: false, // Desativa o quadrado nativo desalinhado
+              displayColors: false,
               callbacks: {
                 label: function (context) {
+                  const mesSelecionado = document.getElementById('seletorMes').value;
+                  const dadosLimites = dadosDosMeses[mesSelecionado]?.charts.limites || dataAtual.charts.limites;
                   const index = context.dataIndex;
                   const handsVal = context.raw.toLocaleString();
-                  const bbVal = stakesData.bb100[index];
+                  const bbVal = dadosLimites.bb100[index];
+                  return [`🟦 Mãos: ${handsVal}`, `🟩 Winrate: ${bbVal} BB/100`];
+                }
+              }
+            }
+          }
+        }
+      });
+
+      handsChart = new Chart(document.getElementById('handsChart'), {
+        type: 'bar',
+        data: {
+          labels: dataAtual.charts.volume.labels,
+          datasets: [{
+            data: dataAtual.charts.volume.maos,
+            backgroundColor: "#3B82F6", barThickness: 24
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              displayColors: false,
+              callbacks: {
+                label: function (context) {
+                  const mesSelecionado = document.getElementById('seletorMes').value;
+                  const dadosVolume = dadosDosMeses[mesSelecionado]?.charts.volume || dataAtual.charts.volume;
+                  const index = context.dataIndex;
+                  const handsVal = context.raw.toLocaleString();
+                  const profitVal = dadosVolume.lucro[index].toLocaleString();
+                  const bbVal = dadosVolume.bb100[index];
                   return [
                     `🟦 Mãos: ${handsVal}`,
+                    `🟩 Lucro: $${profitVal}`,
                     `🟩 Winrate: ${bbVal} BB/100`
                   ];
                 }
@@ -222,53 +291,59 @@
       });
     }
 
-    // Dados do Volume Mensal
-    const monthlyData = {
-      labels: ["Abr", "Mai", "Jun", "Jul", "Ago"],
-      hands: [42000, 58000, 61000, 53000, 56240],
-      profit: [950, 1400, 1100, 1650, 1824],
-      bb100: [4.5, 6.0, 4.8, 7.8, 6.35]
-    };
+    // Função que é chamada toda vez que o menu dropdown muda
+    function atualizarPainel() {
+      const mesSelecionado = document.getElementById('seletorMes').value;
+      const data = dadosDosMeses[mesSelecionado];
 
-    // Gráfico de Volume Mensal
-    const ctxHands = document.getElementById('handsChart');
-    if (ctxHands) {
-      new Chart(ctxHands, {
-        type: 'bar',
-        data: {
-          labels: monthlyData.labels,
-          datasets: [{
-            label: "Mãos",
-            data: monthlyData.hands,
-            backgroundColor: "#3B82F6",
-            barThickness: 24
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              displayColors: false, // Desativa o quadrado nativo desalinhado
-              callbacks: {
-                label: function (context) {
-                  const index = context.dataIndex;
-                  const handsVal = context.raw.toLocaleString();
-                  const profitVal = monthlyData.profit[index].toLocaleString();
-                  const bbVal = monthlyData.bb100[index];
-                  return [
-                    `🟦 Mãos: ${handsVal}`,
-                    `🟩 Lucro: +$${profitVal}`,
-                    `🟩 Winrate: ${bbVal} BB/100`
-                  ];
-                }
-              }
-            }
-          }
-        }
-      });
+      // Se o mês não tiver dados cadastrados no JS, não faz nada
+      if (!data) return;
+
+      // 1. Atualizar Cards
+      document.getElementById('card-maos').innerText = data.cards.maos;
+      
+      const cardLucro = document.getElementById('card-lucro');
+      cardLucro.innerText = data.cards.lucro;
+      // Muda a cor do lucro para vermelho se for negativo, verde se positivo
+      if(data.cards.lucro.includes("-")) {
+        cardLucro.className = "text-3xl font-bold text-red-400 mt-2";
+      } else {
+        cardLucro.className = "text-3xl font-bold text-green-400 mt-2";
+      }
+      
+      document.getElementById('card-bb100').innerText = data.cards.bb100;
+      document.getElementById('card-rakeback').innerText = data.cards.rakeback;
+      document.getElementById('card-bankroll').innerText = data.cards.bankroll;
+
+      // 2. Atualizar Metas
+      document.getElementById('meta-maos-texto').innerText = data.metas.maos + "%";
+      document.getElementById('meta-maos-barra').style.width = data.metas.maos + "%";
+      
+      document.getElementById('meta-horas-texto').innerText = data.metas.horas + "%";
+      document.getElementById('meta-horas-barra').style.width = data.metas.horas + "%";
+
+      // 3. Atualizar Gráficos (animação automática do Chart.js)
+      profitChart.data.datasets[0].data = data.charts.lucroLinha;
+      profitChart.update();
+
+      bankrollChart.data.datasets[0].data = data.charts.bankrollLinha;
+      bankrollChart.update();
+
+      stakesChart.data.datasets[0].data = data.charts.limites.maos;
+      stakesChart.update();
+
+      handsChart.data.labels = data.charts.volume.labels;
+      handsChart.data.datasets[0].data = data.charts.volume.maos;
+      handsChart.update();
     }
+
+    // Inicializa a página
+    window.onload = function() {
+      inicializarGraficos();
+      
+      // Adiciona o "escutador" para mudar os dados quando escolher outro mês
+      document.getElementById('seletorMes').addEventListener('change', atualizarPainel);
+    };
   </script>
 
 </body>
